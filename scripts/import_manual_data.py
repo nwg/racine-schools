@@ -21,7 +21,7 @@ def format_grade(s):
     return f'{intgrade:02}'
 
 def schools():
-    with open('racine-schools-directory.csv', newline='') as csvfile:
+    with open('data/racine-schools-directory.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             d = {}
@@ -32,6 +32,9 @@ def schools():
 
             d['low_grade'] = format_grade(row['low grade'])
             d['high_grade'] = format_grade(row['high grade'])
+            d['state_lea_id'] = '4620'
+            d['state_school_id'] = row['School Code'] or None
+            d['pss_ppin'] = row['PPIN'] or None
 
             yield d
 
