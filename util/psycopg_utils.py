@@ -6,6 +6,8 @@ import logging
 from stringcsv import StringDictWriter
 from iterstringio import IterStringIO
 
+def idequals(ident, value):
+    return equals(sql.Identifier(ident), sql.Literal(value))
 
 def equals(id1, id2):
     return sql.SQL('=').join([id1, id2])
@@ -24,7 +26,10 @@ def using(columns):
     return sql.SQL('using ({})').format(columns_sql)
 
 def select(table, items, join=[], where=None):
-    columns_list = sql.SQL(', ').join(items)
+    if items == '*':
+        columns_list = sql.SQL('*')
+    else:
+        columns_list = sql.SQL(', ').join(items)
     q = sql.SQL("""select {} from {}""").format(columns_list, sql.Identifier(table))
     if join:
         for jtype, jtable, condition in join:

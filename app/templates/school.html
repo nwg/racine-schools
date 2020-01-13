@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+td,
+th {
+    border: 1px solid rgb(190, 190, 190);
+    padding: 10px;
+}
+
+td {
+    text-align: center;
+}
+
+tr:nth-child(even) {
+    background-color: #eee;
+}
+
+th[scope="col"] {
+    background-color: #696969;
+    color: #fff;
+}
+
+th[scope="row"] {
+    background-color: #d7d9f2;
+}
+
+caption {
+    padding: 10px;
+    caption-side: top;
+}
+
+table {
+    border-collapse: collapse;
+    border: 2px solid rgb(200, 200, 200);
+    letter-spacing: 1px;
+    font-family: sans-serif;
+    font-size: .8rem;
+}
+</style>
+    <head>
+        <title>{{school['longname']}}</title>
+    </head>
+    <body>
+        <h1>{{school['longname']}}</h1>
+        <table>
+            <caption>Summary</caption>
+            <tr>
+                <th scope="row">Grades Included</th>
+                <td>{{school['low_grade']}}-{{school['high_grade']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Is Elementary School</th>
+                <td>{{school['is_elementary']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Is Middle School</th>
+                <td>{{school['is_middle']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Is High School</th>
+                <td>{{school['is_high']}}</td>
+            </tr>
+        </table>
+
+    </body>
+</html>
+
+
