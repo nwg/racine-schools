@@ -7,6 +7,17 @@ from psycopg2 import sql
 
 MOST_RECENT_STAFF_YEAR = 2018
 
+RACE_COLS = [
+    'american_indian_or_alaska_native',
+    'asian',
+    'hawaiian_or_pacific_islander',
+    'hispanic',
+    'black',
+    'white',
+    'two_or_more_races',
+    'total'
+]
+
 EDUCATION_MAP = {
     3: 'associate',
     4: 'bachelors',
@@ -22,12 +33,15 @@ def render_school_with_name(name):
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
     #assert False, school
+
     return render_template(
         'school.html',
         school=school,
         staff_by_category_by_sex=get_staff_by_category_by_sex(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id),
         staff_by_category_by_education=get_staff_by_category_by_education(cur, state_lea_id, state_school_id),
         staff_by_category_by_tenure=get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id),
+        discipline_by_type_by_sex=get_discipline_by_type_by_sex(cur, school['nces_id']),
+        discipline_by_type_by_race=get_discipline_by_type_by_race(cur, school['nces_id'])
     )
 
 def get_staff_by_category_by_sex(cur, year, state_lea_id, state_school_id):
@@ -123,3 +137,96 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
             staff_by_category_by_tenure[category] = by_tenure
 
     return staff_by_category_by_tenure
+
+iss_categories = [
+    'SWD: Students receiving one or more in-school suspensions',
+    'SWOD: Students receiving one or more in-school suspensions'
+]
+
+oss_categories = [
+    'SWD: Students receiving more than one out-of-school suspension',
+    'SWD: Students receiving only one out-of-school suspension',
+    'SWOD: Students receiving more than one out-of-school suspension',
+    'SWOD: Students receiving only one out-of-school suspension',
+]
+
+referral_categories = [
+    'SWD: Referral to law enforcement',
+    'SWOD: Referral to law enforcement',
+]
+
+def get_discipline_by_type_by_sex(cur, nces_id):
+    if nces_id == None:
+        return None
+
+    def query_sex_counts(categories):
+
+        table = sql.Identifier('discipline_counts')
+        orr_categories = orr(idequals('category', category) for category in categories)
+
+        statement = sql.SQL("""select sex, sum(total::integer) as total from {} where {} group by sex""").format(
+            table,
+            andd([
+                idequals('nces_id', nces_id),
+                idequals('year', 2015),
+                orr_categories]))
+        return statement
+
+    cur.execute(query_sex_counts(iss_categories))
+    iss_counts = dict(cur.fetchall())
+
+    cur.execute(query_sex_counts(oss_categories))
+    oss_counts = dict(cur.fetchall())
+    #print(oss_counts)
+
+    cur.execute(query_sex_counts(referral_categories))
+    referral_counts = dict(cur.fetchall())
+
+    by_type_by_sex = {}
+    by_type_by_sex['iss'] = iss_counts
+    by_type_by_sex['oss'] = oss_counts
+    by_type_by_sex['referral'] = referral_counts
+
+    return by_type_by_sex
+
+def get_discipline_by_type_by_race(cur, nces_id):
+    if not nces_id:
+        return None
+
+    def query_race_counts(categories):
+
+        table = sql.Identifier('discipline_counts')
+        orr_categories = orr(idequals('category', category) for category in categories)
+
+        def sum_col(identifier):
+            return sql.SQL("""round(sum({0}::float))::int as {0}""").format(sql.Identifier(identifier))
+
+        cols = sql.SQL(', ').join(sum_col(race_col) for race_col in RACE_COLS)
+
+        statement = sql.SQL("""select {} from {} where {}""").format(
+            cols,
+            table,
+            andd([
+                idequals('nces_id', nces_id),
+                orr_categories]))
+        return statement
+
+    def make_races_dict(cols):
+        return dict(zip(RACE_COLS, cols))
+
+    def get_race_counts(cur, categories):
+        statement = query_race_counts(categories)
+        cur.execute(statement)
+        cols = cur.fetchall()
+        assert len(cols) == 1, 'bad len'
+        counts = make_races_dict(cols[0])
+        return counts
+
+    by_type_by_race = {
+        'iss': get_race_counts(cur, iss_categories),
+        'oss': get_race_counts(cur, oss_categories),
+        'referral': get_race_counts(cur, referral_categories),
+    }
+
+    return by_type_by_race
+

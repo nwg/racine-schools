@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% set race_order = ['american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'black', 'white', 'two_or_more_races', 'total'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
     ('associate', "Associate Degree"),
@@ -139,6 +140,61 @@ table {
             {% endfor %}
         </table>
 
+        <table>
+            <caption>Discipline Actions by Sex (2015-2016)</caption>
+            <tr>
+                <th scope="col">Sex</th>
+                <th scope="col">In-School Suspension</th>
+                <th scope="col">Out-of-School Suspension</th>
+                <th scope="col">Referral to Law Enforcement</th>
+            </tr>
+
+            <tr>
+                <th scope="row">Female</th>
+                <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
+                <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
+                <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
+            </tr>
+            <tr>
+                <th scope="row">Male</th>
+                <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
+                <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
+                <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
+            </tr>
+        </table>
+        <table>
+            <caption>Discipline Actions by Race (2015-2016)</caption>
+            <tr>
+                <th scope="col">Type of Action</th>
+                <th scope="col">American Indian or Alaska Native</th>
+                <th scope="col">Asian</th>
+                <th scope="col">Hawaiian or Pacific Islander</th>
+                <th scope="col">Hispanic</th>
+                <th scope="col">Black</th>
+                <th scope="col">White</th>
+                <th scope="col">Two or More Races</th>
+                <th scope="col">Total</th>
+            </tr>
+
+            <tr>
+                <th scope="row">In-School Suspension</th>
+                {% for race in race_order %}
+                <td>{{discipline_by_type_by_race['iss'][race]}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th scope="row">Out-of-School Suspension</th>
+                {% for race in race_order %}
+                <td>{{discipline_by_type_by_race['oss'][race]}}</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th scope="row">Referral to Law Enforcement</th>
+                {% for race in race_order %}
+                <td>{{discipline_by_type_by_race['referral'][race]}}</td>
+                {% endfor %}
+            </tr>
+        </table>
 
     </body>
 </html>

@@ -24,6 +24,9 @@ def schools():
     with open('data/racine-schools-directory.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
+            if not row['name']:
+                continue
+
             d = {}
             d['longname'] = row['name']
             d['is_elementary'] = get_bool(row['E'])
@@ -32,9 +35,10 @@ def schools():
 
             d['low_grade'] = format_grade(row['low grade'])
             d['high_grade'] = format_grade(row['high grade'])
-            d['state_lea_id'] = '4620'
+            d['state_lea_id'] = row['District Code'] or None
             d['state_school_id'] = row['School Code'] or None
             d['pss_ppin'] = row['PPIN'] or None
+            d['nces_id'] = row['NCES'] or None
 
             yield d
 

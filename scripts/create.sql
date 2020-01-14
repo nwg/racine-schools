@@ -47,3 +47,26 @@ create table if not exists appointments (
 create table appointments_imported (
     year integer primary key
 );
+
+create table discipline_counts (
+    nces_id bigint not null,
+    year integer not null,
+    category text not null,
+    sex character(1) not null,
+    american_indian_or_alaska_native text not null,
+    asian text not null,
+    hawaiian_or_pacific_islander text not null,
+    hispanic text not null,
+    black text not null,
+    white text not null,
+    two_or_more_races text not null,
+    total_idea_only text,
+    total_504_only text,
+    total text not null,
+    less_lep text not null,
+    UNIQUE (nces_id, year, category, sex)
+);
+
+create table discipline_counts_imported (
+    year integer primary key
+);
