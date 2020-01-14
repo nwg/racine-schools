@@ -1,3 +1,16 @@
+create table education_levels (
+    level integer primary key,
+    level_name text
+);
+
+insert into education_levels values
+    (3, $$Associate degree$$),
+    (4, $$Bachelor's degree$$),
+    (5, $$Master's degree$$),
+    (6, $$6-year Specialist's degree$$),
+    (7, $$Doctorate$$),
+    (8, $$Other$$);
+
 create table schools (
     id serial primary key,
     state_lea_id text,
@@ -16,3 +29,21 @@ create table schools (
     UNIQUE (nces_lea_id, nces_school_id)
 );
 
+create table if not exists appointments (
+    id serial primary key,
+    staff_id text,
+    year integer not null,
+    first_name text,
+    last_name text,
+    state_lea_id text not null,
+    state_school_id text not null,
+    position_code integer,
+    position_category text,
+    gender text check (gender in ('M', 'F')),
+    education_level integer references education_levels (level),
+    fte real
+);
+
+create table appointments_imported (
+    year integer primary key
+);
