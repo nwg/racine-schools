@@ -62,7 +62,7 @@ def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
         idequals('state_school_id', state_school_id),
     ])
     query = sql.SQL(
-        """select position_category, education_level, sum(fte) from {} where {} group by position_category, education_level"""
+        """select position_category, education_level, COALESCE(sum(fte), 0) from {} where {} group by position_category, education_level"""
     ).format(table, where)
 
     cur.execute(query)

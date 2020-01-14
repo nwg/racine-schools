@@ -104,22 +104,18 @@ table {
             <caption>Staff per Category by Education Level (2018-2019)</caption>
             <tr>
                 <th scope="col">Category</th>
-                <th scope="col">Education Level</th>
-                <th scope="col">Count</th>
+                {% for degree in degree_order %}
+                <th scope="col">{{degree_map[degree]}}</th>
+                {% endfor %}
             </tr>
 
             {% for category in category_order if category in staff_by_category_by_education %}
             <tr>
-                <td rowspan="{{degree_order|length}}">{{category}}</td>
-                <td>{{degree_map[degree_order[0]]}}</td>
-                <td>{{staff_by_category_by_education[category].get(degree_order[0], 0)}}</td>
+                <td>{{category}}</td>
+                {% for degree in degree_order %}
+                <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
+                {% endfor %}
             </tr>
-            {% for degree in degree_order[1:] %}
-            <tr>
-                <td>{{degree_map[degree]}}</td>
-                <td>{{staff_by_category_by_education[category].get(degree, 0)}}</td>
-            </tr>
-            {% endfor %}
 
             {% endfor %}
         </table>
