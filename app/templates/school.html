@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% set race_order = ['american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'black', 'white', 'two_or_more_races', 'total'] %}
+{% set grade_order = ['PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
     ('associate', "Associate Degree"),
@@ -88,7 +89,7 @@ table {
                 <th scope="col">Count</th>
             </tr>
 
-            {% for grade in enrollment_by_grade_by_sex.keys()|sort %}
+            {% for grade in grade_order if grade in enrollment_by_grade_by_sex %}
             <tr>
                 <td rowspan="2">{{grade}}</td>
                 <td>F</td>
@@ -115,7 +116,7 @@ table {
                 <th scope="col">Total</th>
             </tr>
 
-            {% for grade in enrollment_by_grade_by_race.keys()|sort %}
+            {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
             <tr>
                 <th scope="row">{{grade}}</th>
                 {% for race in race_order %}

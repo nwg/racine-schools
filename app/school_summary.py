@@ -56,7 +56,7 @@ def get_enrollment_by_grade_by_sex(cur, nces_id):
         ])
 
         query = sql.SQL(
-            """select grade::int, sex, sum(total::integer) as total from {} where {} group by grade, sex"""
+            """select grade, sex, sum(total::integer) as total from {} where {} group by grade, sex"""
         ).format(table, where)
 
         return query
@@ -86,7 +86,7 @@ def get_enrollment_by_grade_by_race(cur, nces_id):
         race_cols = sql.SQL(', ').join(sumcol(col) for col in RACE_COLS)
 
         query = sql.SQL(
-            """select grade::int, {} from {} where {} group by grade"""
+            """select grade, {} from {} where {} group by grade"""
         ).format(race_cols, table, where)
 
         return query
