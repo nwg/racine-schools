@@ -70,3 +70,20 @@ create table discipline_counts (
 create table discipline_counts_imported (
     year integer primary key
 );
+
+create table if not exists nces_enrollment_counts (
+    nces_id bigint not null,
+    year integer not null,
+    grade character(2) check (grade in ('PK', 'K3', 'K4', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', 'UE', 'US', 'UG', 'AE')),
+    sex character(1) not null check (sex in ('M', 'F')),
+    american_indian_or_alaska_native text not null,
+    asian text not null,
+    hawaiian_or_pacific_islander text not null,
+    hispanic text not null,
+    black text not null,
+    white text not null,
+    two_or_more_races text not null,
+    total text not null,
+    UNIQUE (nces_id, year, grade, sex)
+);
+

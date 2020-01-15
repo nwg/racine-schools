@@ -41,8 +41,67 @@ def render_school_with_name(name):
         staff_by_category_by_education=get_staff_by_category_by_education(cur, state_lea_id, state_school_id),
         staff_by_category_by_tenure=get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id),
         discipline_by_type_by_sex=get_discipline_by_type_by_sex(cur, school['nces_id']),
-        discipline_by_type_by_race=get_discipline_by_type_by_race(cur, school['nces_id'])
+        discipline_by_type_by_race=get_discipline_by_type_by_race(cur, school['nces_id']),
+        enrollment_by_grade_by_sex=get_enrollment_by_grade_by_sex(cur, school['nces_id']),
+        enrollment_by_grade_by_race=get_enrollment_by_grade_by_race(cur, school['nces_id']),
     )
+
+def get_enrollment_by_grade_by_sex(cur, nces_id):
+    def query_sex_enrollment_counts():
+        table = sql.Identifier('nces_enrollment_counts')
+
+        where = andd([
+            idequals('year', 2017),
+            idequals('nces_id', nces_id)
+        ])
+
+        query = sql.SQL(
+            """select grade::int, sex, sum(total::integer) as total from {} where {} group by grade, sex"""
+        ).format(table, where)
+
+        return query
+
+    cur.execute(query_sex_enrollment_counts())
+
+    enrollment_by_grade_by_sex = {}
+    for grade, sex, total in cur.fetchall():
+        by_sex = enrollment_by_grade_by_sex.get(grade, {})
+        by_sex[sex] = total
+        enrollment_by_grade_by_sex[grade] = by_sex
+
+    return enrollment_by_grade_by_sex
+
+def get_enrollment_by_grade_by_race(cur, nces_id):
+    def query_race_enrollment_counts():
+        table = sql.Identifier('nces_enrollment_counts')
+
+        where = andd([
+            idequals('year', 2017),
+            idequals('nces_id', nces_id)
+        ])
+
+        def sumcol(race):
+            return sql.SQL("""sum({0}::integer) as {0}""").format(sql.Identifier(race))
+
+        race_cols = sql.SQL(', ').join(sumcol(col) for col in RACE_COLS)
+
+        query = sql.SQL(
+            """select grade::int, {} from {} where {} group by grade"""
+        ).format(race_cols, table, where)
+
+        return query
+
+    cur.execute(query_race_enrollment_counts())
+    enrollment_by_grade_by_race = {}
+    for row in cur.fetchall():
+        grade = row[0]
+        races = row[1:]
+        race_percent = [ count / float(races[-1]) * 100 for count in races ]
+        assert len(races) == len(RACE_COLS)
+        race_dict = dict(zip(RACE_COLS, zip(races, race_percent)))
+        enrollment_by_grade_by_race[grade] = race_dict
+
+    return enrollment_by_grade_by_race
 
 def get_staff_by_category_by_sex(cur, year, state_lea_id, state_school_id):
     table = sql.Identifier('appointments')

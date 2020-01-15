@@ -81,6 +81,57 @@ table {
         </table>
 
         <table>
+            <caption>Students per Grade by Gender (2017-2018)</caption>
+            <tr>
+                <th scope="col">Grade</th>
+                <th scope="col">Gender</th>
+                <th scope="col">Count</th>
+            </tr>
+
+            {% for grade in enrollment_by_grade_by_sex.keys()|sort %}
+            <tr>
+                <td rowspan="2">{{grade}}</td>
+                <td>F</td>
+                <td>{{enrollment_by_grade_by_sex[grade]['F']}}</td>
+            </tr>
+            <tr>
+                <td>M</td>
+                <td>{{enrollment_by_grade_by_sex[grade]['M']}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <table>
+            <caption>Students per Grade by Race (2017-2018)</caption>
+            <tr>
+                <th scope="col">Grade</th>
+                <th scope="col">American Indian or Alaska Native</th>
+                <th scope="col">Asian</th>
+                <th scope="col">Hawaiian or Pacific Islander</th>
+                <th scope="col">Hispanic</th>
+                <th scope="col">Black</th>
+                <th scope="col">White</th>
+                <th scope="col">Two or More Races</th>
+                <th scope="col">Total</th>
+            </tr>
+
+            {% for grade in enrollment_by_grade_by_race.keys()|sort %}
+            <tr>
+                <th scope="row">{{grade}}</th>
+                {% for race in race_order %}
+                {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
+                {% if race != 'total' %}
+                <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                {% else %}
+                <td>{{count}}</td>
+                {% endif %}
+
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+        <table>
             <caption>Staff per Category by Gender (2018-2019)</caption>
             <tr>
                 <th scope="col">Category</th>
