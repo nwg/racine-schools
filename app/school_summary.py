@@ -32,18 +32,24 @@ def render_school_summary_with_name(name):
     school = db.school_with_name(name)
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
-    #assert False, school
+    nces_id = school['nces_id']
+
+    d = {}
+    if state_lea_id and state_school_id:
+        d['staff_by_category_by_sex'] = get_staff_by_category_by_sex(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+        d['staff_by_category_by_education'] = get_staff_by_category_by_education(cur, state_lea_id, state_school_id)
+        d['staff_by_category_by_tenure'] = get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id)
+
+    if nces_id:
+        d['discipline_by_type_by_sex'] = get_discipline_by_type_by_sex(cur, nces_id)
+        d['discipline_by_type_by_race'] = get_discipline_by_type_by_race(cur, nces_id)
+        d['enrollment_by_grade_by_sex'] = get_enrollment_by_grade_by_sex(cur, nces_id)
+        d['enrollment_by_grade_by_race'] = get_enrollment_by_grade_by_race(cur, nces_id)
 
     return render_template(
         'school.html',
         school=school,
-        staff_by_category_by_sex=get_staff_by_category_by_sex(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id),
-        staff_by_category_by_education=get_staff_by_category_by_education(cur, state_lea_id, state_school_id),
-        staff_by_category_by_tenure=get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id),
-        discipline_by_type_by_sex=get_discipline_by_type_by_sex(cur, school['nces_id']),
-        discipline_by_type_by_race=get_discipline_by_type_by_race(cur, school['nces_id']),
-        enrollment_by_grade_by_sex=get_enrollment_by_grade_by_sex(cur, school['nces_id']),
-        enrollment_by_grade_by_race=get_enrollment_by_grade_by_race(cur, school['nces_id']),
+        **d
     )
 
 def get_enrollment_by_grade_by_sex(cur, nces_id):
@@ -124,6 +130,9 @@ def get_staff_by_category_by_sex(cur, year, state_lea_id, state_school_id):
         by_sex[gender] = count
         staff_by_category_by_sex[category] = by_sex
 
+    if not staff_by_category_by_sex:
+        return None
+
     return staff_by_category_by_sex
 
 def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
@@ -144,6 +153,9 @@ def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
         by_education = staff_by_category_by_education.get(category, {})
         by_education[EDUCATION_MAP[education_level]] = count
         staff_by_category_by_education[category] = by_education
+
+    if not staff_by_category_by_education:
+        return None
 
     return staff_by_category_by_education
 
@@ -195,6 +207,9 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
             by_tenure[key] = count
             staff_by_category_by_tenure[category] = by_tenure
 
+    if not staff_by_category_by_tenure:
+        return None
+
     return staff_by_category_by_tenure
 
 iss_categories = [
@@ -215,9 +230,6 @@ referral_categories = [
 ]
 
 def get_discipline_by_type_by_sex(cur, nces_id):
-    if nces_id == None:
-        return None
-
     def query_sex_counts(categories):
 
         table = sql.Identifier('discipline_counts')
@@ -249,9 +261,6 @@ def get_discipline_by_type_by_sex(cur, nces_id):
     return by_type_by_sex
 
 def get_discipline_by_type_by_race(cur, nces_id):
-    if not nces_id:
-        return None
-
     def query_race_counts(categories):
 
         table = sql.Identifier('discipline_counts')
