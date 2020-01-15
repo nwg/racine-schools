@@ -102,7 +102,11 @@ def get_enrollment_by_grade_by_race(cur, nces_id):
     for row in cur.fetchall():
         grade = row[0]
         races = row[1:]
-        race_percent = [ count / float(races[-1]) * 100 for count in races ]
+        if races[-1] > 0:
+            race_percent = [ count / float(races[-1]) * 100 for count in races ]
+        else:
+            assert all(count == 0 for count in races), races
+            race_percent = [ 0.0 ] * len(races)
         assert len(races) == len(RACE_COLS)
         race_dict = dict(zip(RACE_COLS, zip(races, race_percent)))
         enrollment_by_grade_by_race[grade] = race_dict
