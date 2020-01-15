@@ -2,7 +2,7 @@ from flask import render_template
 from app import app
 from app import db
 from app.db import conn, cur
-from psycopg_utils import idequals, andd, orr
+from psycopg_utils import select, idequals, andd, orr
 from psycopg2 import sql
 
 MOST_RECENT_STAFF_YEAR = 2018
@@ -230,6 +230,11 @@ referral_categories = [
 ]
 
 def get_discipline_by_type_by_sex(cur, nces_id):
+    query = select('discipline_counts', '*', where=idequals('nces_id', nces_id))
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     def query_sex_counts(categories):
 
         table = sql.Identifier('discipline_counts')
@@ -261,6 +266,11 @@ def get_discipline_by_type_by_sex(cur, nces_id):
     return by_type_by_sex
 
 def get_discipline_by_type_by_race(cur, nces_id):
+    query = select('discipline_counts', '*', where=idequals('nces_id', nces_id))
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     def query_race_counts(categories):
 
         table = sql.Identifier('discipline_counts')
