@@ -28,7 +28,7 @@ EDUCATION_MAP = {
     None: 'unreported',
 }
 
-def render_school_with_name(name):
+def render_school_summary_with_name(name):
     school = db.school_with_name(name)
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
