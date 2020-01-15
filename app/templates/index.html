@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Racine Schools</title>
+    </head>
+    <body>
+        <table>
+            <caption>Schools</caption>
+            <tr>
+                <th>School</th>
+                <th>lea_id</th>
+                <th>school_id</th>
+                <th>nces_id</th>
+            </tr>
+            {% for s in schools %}
+            <tr>
+                <td><a href="s/{{s.longname}}">{{s.longname}}</a></td>
+                <td>{{s.state_lea_id}}</td>
+                <td>{{s.state_school_id}}</td>
+                <td>{{s.nces_id}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+
+    </body>
+</html>
+
+

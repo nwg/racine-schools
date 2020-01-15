@@ -9,3 +9,8 @@ def school_with_name(name):
     sql = select('schools', '*', where=idequals('longname', name))
     cur.execute(sql)
     return cur.fetchone()
+
+def all_schools():
+    sql = select('schools', '*')
+    cur.execute(sql)
+    return cur.fetchall()
