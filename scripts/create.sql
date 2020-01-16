@@ -87,3 +87,78 @@ create table if not exists nces_enrollment_counts (
     UNIQUE (nces_id, year, grade, sex)
 );
 
+create table pss_religious_orientation (
+    category integer primary key,
+    label text
+);
+
+insert into pss_religious_orientation values
+    (1, 'Roman Catholic'),
+    (2, 'African Methodist Episcopal'),
+    (3, 'Amish'),
+    (4, 'Assembly of God'),
+    (5, 'Baptist'),
+    (6, 'Brethren'),
+    (7, 'Calvinist'),
+    (8, 'Christian (no specific denomination)'),
+    (9, 'Church of Christ'),
+    (10, 'Church of God'),
+    (11, 'Church of God in Christ'),
+    (12, 'Church of the Nazarene'),
+    (13, 'Disciples of Christ'),
+    (14, 'Episcopal'),
+    (15, 'Friends'),
+    (16, 'Greek Orthodox'),
+    (17, 'Islamic'),
+    (18, 'Jewish'),
+    (19, 'Latter Day Saints'),
+    (20, 'Lutheran Church - Missouri Synod'),
+    (21, 'Evangelical Lutheran Church in America'),
+    (22, 'Wisconsin Evangelical Luteran Synod'),
+    (23, 'Other Lutheran'),
+    (24, 'Mennonite'),
+    (25, 'Methodist'),
+    (26, 'Pentecostal'),
+    (27, 'Presbyterian'),
+    (28, 'Seventh-Day Adventist'),
+    (29, 'Other');
+
+
+create table pss_info (
+    ppin text primary key,
+    year integer not null,
+    kg_hours integer,
+    kg_days_per_week integer,
+    is_religious bool not null,
+    religious_orientation integer references pss_religious_orientation (category),
+    days_in_year integer,
+    hours_in_day integer,
+    minutes_in_day integer,
+    num_students integer,
+    num_fte_teachers numeric(4, 1),
+    UNIQUE (ppin, year)
+);
+
+create table pss_enrollment_grade_counts (
+    ppin text primary key,
+    year integer not null,
+    grade character(2) not null check (grade in ('PK', 'K3', 'K4', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', 'UE', 'US', 'UG', 'AE')),
+    enrollment integer not null,
+    UNIQUE (ppin, year, grade)
+);
+
+create table pss_enrollment_race_counts (
+    ppin text primary key,
+    year integer not null,
+    american_indian_or_alaska_native integer not null,
+    asian integer not null,
+    hawaiian_or_pacific_islander integer not null,
+    hispanic integer not null,
+    black integer not null,
+    white integer not null,
+    two_or_more_races integer not null,
+    male integer not null,
+    female integer not null,
+    total integer not null,
+    UNIQUE (ppin, year)
+);
