@@ -6,6 +6,9 @@ import logging
 from stringcsv import StringDictWriter
 from iterstringio import IterStringIO
 
+def colsequal(col1, col2):
+    return equals(sql.Identifier(*col1), sql.Identifier(*col2))
+
 def idequals(ident, value):
     return equals(sql.Identifier(ident), sql.Literal(value))
 
@@ -17,6 +20,10 @@ def andd(elements):
 
 def orr(elements):
     return sql.SQL('( {} )').format(sql.SQL(' OR ').join(elements))
+
+
+def on(sq):
+    return sql.SQL('ON {}').format(sq)
 
 def using(columns):
     if not isinstance(columns, Sequence) or isinstance(columns, str):

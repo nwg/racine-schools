@@ -2,7 +2,7 @@ from flask import render_template
 from app import app
 from app import db
 from app.db import conn, cur
-from psycopg_utils import select, idequals, andd, orr
+from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
 
 MOST_RECENT_STAFF_YEAR = 2018
@@ -33,6 +33,7 @@ def render_school_summary_with_name(name):
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
     nces_id = school['nces_id']
+    ppin = school['pss_ppin']
 
     d = {}
     if state_lea_id and state_school_id:
@@ -46,11 +47,32 @@ def render_school_summary_with_name(name):
         d['enrollment_by_grade_by_sex'] = get_enrollment_by_grade_by_sex(cur, nces_id)
         d['enrollment_by_grade_by_race'] = get_enrollment_by_grade_by_race(cur, nces_id)
 
+    if ppin:
+        d['pss_info'] = get_pss_info(cur, ppin)
+
     return render_template(
         'school.html',
         school=school,
         **d
     )
+
+def get_pss_info(cur, ppin):
+    def query_pss_info():
+        joins = [
+            (
+                'left outer',
+                'pss_religious_orientation',
+                on(
+                    colsequal(
+                        ['pss_info', 'religious_orientation'],
+                        ['pss_religious_orientation', 'category']))
+            ),
+        ]
+        return select('pss_info', '*', where=idequals('ppin', ppin), join=joins)
+    q = query_pss_info()
+    cur.execute(q)
+
+    return cur.fetchone()
 
 def get_enrollment_by_grade_by_sex(cur, nces_id):
     def query_sex_enrollment_counts():

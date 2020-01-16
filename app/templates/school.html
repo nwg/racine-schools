@@ -97,6 +97,53 @@ ul.schools-tables {
                 </table>
             </li>
 
+        {% if pss_info is defined and pss_info %}
+        <li>
+            <table>
+                <caption>Private School Data</caption>
+                <tr>
+                    <th scope="row">Kindergarten Hours</td>
+                    <td>{{pss_info.kg_hours}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Kindergarten Days Per Week</td>
+                    <td>{{pss_info.kg_days_per_week}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Is Religious</td>
+                    <td>{% if pss_info.is_religious %}Yes{% else %}No{% endif %}</td>
+                </tr>
+                {% if pss_info.is_religious %}
+                <tr>
+                    <th scope="row">Orientation</th>
+                    <td>{{pss_info.label}}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Days in School Year</th>
+                    <td>{{pss_info.days_in_year}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Time in School Day</th>
+                    <td>{{"%02d"|format(pss_info.hours_in_day)}}:{{"%02d"|format(pss_info.minutes_in_day)}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Num Students</th>
+                    <td>{{pss_info.num_students}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Num Full-Time Teachers</th>
+                    <td>{{pss_info.num_fte_teachers}}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Student-Teacher Ratio</th>
+                    <td>{{"%.02f"|format(pss_info.num_students/pss_info.num_fte_teachers)}}</td>
+                </tr>
+            </table>
+        </li>
+        {% else %}
+        <li>Private School Data not available</li>
+        {% endif %}
         {% if enrollment_by_grade_by_sex is defined and enrollment_by_grade_by_sex %}
         <li>
             <table>

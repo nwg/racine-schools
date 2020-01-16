@@ -118,7 +118,7 @@ if __name__ == '__main__':
     conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
     cur = conn.cursor()
 
-    stmt = select('appointments', (sql.Identifier('year'),), where=idequals('year', args.year))
+    stmt = select('appointments_imported', (sql.Identifier('year'),), where=idequals('year', args.year))
     cur.execute(stmt)
     if cur.fetchone():
         print(f'Already imported appointments for year {args.year}')
