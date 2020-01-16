@@ -52,6 +52,8 @@ def fix_bad_zip(zipFile):
 def getpath(filename):
     return os.path.join(DOWNLOAD_DIR, filename)
 
+os.mkdir(DOWNLOAD_DIR)
+
 for url, filename in PAIRS:
     path = getpath(filename)
     if os.path.exists(path):
