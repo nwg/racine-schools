@@ -148,7 +148,7 @@ create table pss_enrollment_grade_counts (
     UNIQUE (ppin, year, grade)
 );
 
-create table pss_enrollment_race_counts (
+create table pss_enrollment_demographic_counts (
     ppin text,
     year integer not null,
     american_indian_or_alaska_native integer not null,

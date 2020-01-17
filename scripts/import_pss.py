@@ -85,6 +85,34 @@ def grade_counts():
                 ds.append(d)
         return ds
 
+DEMOGRAPHIC_MAP = (
+    ('american_indian_or_alaska_native', 'P310'),
+    ('asian', 'P316'),
+    ('hawaiian_or_pacific_islander', 'P318'),
+    ('hispanic', 'P320'),
+    ('black', 'P325'),
+    ('white', 'P330'),
+    ('two_or_more_races', 'P332'),
+    ('male', 'P340'),
+    ('total', 'NUMSTUDS')
+)
+
+def demo_counts():
+    with open(args.filename, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            if row['PCNTNM'] != 'RACINE':
+                continue
+            d = {}
+            d['ppin'] = row['PPIN']
+            d['year'] = args.year
+            for col, code in DEMOGRAPHIC_MAP:
+                count = row[code].strip() or 0
+                d[col] = count
+            d['female'] = int(d['total']) - int(d['male'])
+            assert int(d['female']) > 0
+            yield d
+
 if __name__ == '__main__':
 
     conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
@@ -92,5 +120,6 @@ if __name__ == '__main__':
 
     insert_or_update(cur, 'pss_info', ('ppin', 'year'), info())
     insert_or_update(cur, 'pss_enrollment_grade_counts', ('ppin', 'year', 'grade'), grade_counts())
+    insert_or_update(cur, 'pss_enrollment_demographic_counts', ('ppin', 'year'), demo_counts())
 
     conn.commit()

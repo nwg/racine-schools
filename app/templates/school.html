@@ -129,7 +129,7 @@ ul.schools-tables {
                 </tr>
                 <tr>
                     <th scope="row">Num Students</th>
-                    <td>{{pss_info.num_students}}</td>
+                    <td>{{pss_info.enrollment}}</td>
                 </tr>
                 <tr>
                     <th scope="row">Num Full-Time Teachers</th>
@@ -137,7 +137,7 @@ ul.schools-tables {
                 </tr>
                 <tr>
                     <th scope="row">Student-Teacher Ratio</th>
-                    <td>{{"%.02f"|format(pss_info.num_students/pss_info.num_fte_teachers)}}</td>
+                    <td>{{"%.02f"|format(pss_info.enrollment/pss_info.num_fte_teachers)}}</td>
                 </tr>
             </table>
         </li>
@@ -154,16 +154,69 @@ ul.schools-tables {
                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                     <th scope="col">{{grade}}</th>
                     {% endfor %}
+                    {% if pss_info is defined and pss_info %}
+                    <th scope="col">Total</th>
+                    {% endif %}
                 </tr>
                     <th scope="row">Enrollment</th>
                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                     <td>{{pss_enrollment_by_grade[grade]}}</td>
                     {% endfor %}
+                    {% if pss_info is defined and pss_info %}
+                    <td>{{pss_info.enrollment}}</td>
+                    {% endif %}
                 </tr>
             </table>
         </li>
         {% else %}
         <li>Private School Enrollment by Grade not available</li>
+        {% endif %}
+
+        {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
+        <li>
+            <table>
+                <caption>Private School Enrollment by Race (KG and Up)</caption>
+                <tr>
+                    <th scope="row">Race</th>
+                    <th scope="col">American Indian or Alaska Native</th>
+                    <th scope="col">Asian</th>
+                    <th scope="col">Hawaiian or Pacific Islander</th>
+                    <th scope="col">Hispanic</th>
+                    <th scope="col">Black</th>
+                    <th scope="col">White</th>
+                    <th scope="col">Two or More Races</th>
+                    <th scope="col">Total</th>
+                </tr>
+                    <th scope="row">Enrollment</th>
+                    {% for race in race_order %}
+                    <td>{{pss_enrollment_by_demographic[race]}}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </li>
+        {% else %}
+        <li>Private School Enrollment by Race not available</li>
+        {% endif %}
+
+        {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
+        <li>
+            <table>
+                <caption>Private School Enrollment by Sex (KG and Up)</caption>
+                <tr>
+                    <th scope="row">Sex</th>
+                    <th scope="col">Male</th>
+                    <th scope="col">Female</th>
+                    <th scope="col">Total</th>
+                </tr>
+                    <th scope="row">Enrollment</th>
+                    <td>{{pss_enrollment_by_demographic.male}}</td>
+                    <td>{{pss_enrollment_by_demographic.female}}</td>
+                    <td>{{pss_enrollment_by_demographic.total}}</td>
+                </tr>
+            </table>
+        </li>
+        {% else %}
+        <li>Private School Enrollment by Race not available</li>
         {% endif %}
 
         {% if enrollment_by_grade_by_sex is defined and enrollment_by_grade_by_sex %}
