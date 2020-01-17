@@ -43,11 +43,47 @@ def info():
             d['minutes_in_day'] = row['P655']
             d['num_students'] = row['NUMSTUDS']
             d['num_fte_teachers'] = row['NUMTEACH']
+            d['enrollment'] = row['P305'] or None
 
             print(f"""yielding {d['ppin']}""")
 
             yield d
 
+GRADE_MAP = (
+    ('PK', 'P150'),
+    ('KG', 'P160'),
+    ('01', 'P190'),
+    ('02', 'P200'),
+    ('03', 'P210'),
+    ('04', 'P220'),
+    ('05', 'P230'),
+    ('06', 'P240'),
+    ('07', 'P250'),
+    ('08', 'P260'),
+    ('09', 'P270'),
+    ('10', 'P280'),
+    ('11', 'P290'),
+    ('12', 'P300')
+)
+
+def grade_counts():
+    with open(args.filename, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        ds = []
+        for row in reader:
+            if row['PCNTNM'] != 'RACINE':
+                continue
+            for grade, code in GRADE_MAP:
+                enrollment = row[code].strip() or None
+                if not enrollment:
+                    continue
+                d = {}
+                d['ppin'] = row['PPIN']
+                d['year'] = args.year
+                d['grade'] = grade
+                d['enrollment'] = enrollment
+                ds.append(d)
+        return ds
 
 if __name__ == '__main__':
 
@@ -55,5 +91,6 @@ if __name__ == '__main__':
     cur = conn.cursor()
 
     insert_or_update(cur, 'pss_info', ('ppin', 'year'), info())
+    insert_or_update(cur, 'pss_enrollment_grade_counts', ('ppin', 'year', 'grade'), grade_counts())
 
     conn.commit()

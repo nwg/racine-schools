@@ -144,6 +144,28 @@ ul.schools-tables {
         {% else %}
         <li>Private School Data not available</li>
         {% endif %}
+
+        {% if pss_enrollment_by_grade is defined and pss_enrollment_by_grade %}
+        <li>
+            <table>
+                <caption>Private School Enrollment by Grade</caption>
+                <tr>
+                    <th scope="row">Grade</th>
+                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                    <th scope="col">{{grade}}</th>
+                    {% endfor %}
+                </tr>
+                    <th scope="row">Enrollment</th>
+                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                    <td>{{pss_enrollment_by_grade[grade]}}</td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </li>
+        {% else %}
+        <li>Private School Enrollment by Grade not available</li>
+        {% endif %}
+
         {% if enrollment_by_grade_by_sex is defined and enrollment_by_grade_by_sex %}
         <li>
             <table>

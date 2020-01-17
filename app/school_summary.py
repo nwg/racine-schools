@@ -49,6 +49,7 @@ def render_school_summary_with_name(name):
 
     if ppin:
         d['pss_info'] = get_pss_info(cur, ppin)
+        d['pss_enrollment_by_grade'] = get_pss_enrollment_by_grade(cur, ppin)
 
     return render_template(
         'school.html',
@@ -73,6 +74,18 @@ def get_pss_info(cur, ppin):
     cur.execute(q)
 
     return cur.fetchone()
+
+def get_pss_enrollment_by_grade(cur, ppin):
+    def query_pss_enrollment():
+        where = andd([idequals('year', 2017), idequals('ppin', ppin)])
+        return select('pss_enrollment_grade_counts', (sql.Identifier('grade'), sql.Identifier('enrollment')), where=where)
+    q = query_pss_enrollment()
+    cur.execute(q)
+    enrollment_by_grade = {}
+    for row in cur.fetchall():
+        enrollment_by_grade[row['grade']] = row['enrollment']
+
+    return enrollment_by_grade
 
 def get_enrollment_by_grade_by_sex(cur, nces_id):
     def query_sex_enrollment_counts():

@@ -136,11 +136,12 @@ create table pss_info (
     minutes_in_day integer,
     num_students integer,
     num_fte_teachers numeric(4, 1),
+    enrollment integer,
     UNIQUE (ppin, year)
 );
 
 create table pss_enrollment_grade_counts (
-    ppin text primary key,
+    ppin text not null,
     year integer not null,
     grade character(2) not null check (grade in ('PK', 'K3', 'K4', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', 'UE', 'US', 'UG', 'AE')),
     enrollment integer not null,
@@ -148,7 +149,7 @@ create table pss_enrollment_grade_counts (
 );
 
 create table pss_enrollment_race_counts (
-    ppin text primary key,
+    ppin text,
     year integer not null,
     american_indian_or_alaska_native integer not null,
     asian integer not null,
