@@ -28,6 +28,8 @@ EDUCATION_MAP = {
     None: 'unreported',
 }
 
+GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
+
 def render_school_summary_with_name(name):
     school = db.school_with_name(name)
     state_lea_id = school['state_lea_id']
@@ -44,7 +46,7 @@ def render_school_summary_with_name(name):
     if nces_id:
         d['discipline_by_type_by_sex'] = get_discipline_by_type_by_sex(cur, nces_id)
         d['discipline_by_type_by_race'] = get_discipline_by_type_by_race(cur, nces_id)
-        d['enrollment_by_grade_by_sex'] = get_enrollment_by_grade_by_sex(cur, nces_id)
+        d['enrollment_grade_sex_data'] = get_enrollment_grade_sex_data(cur, nces_id)
         d['enrollment_by_grade_by_race'] = get_enrollment_by_grade_by_race(cur, nces_id)
 
     if ppin:
@@ -98,7 +100,7 @@ def get_pss_enrollment_by_demographic(cur, ppin):
     return cur.fetchone()
 
 
-def get_enrollment_by_grade_by_sex(cur, nces_id):
+def get_enrollment_grade_sex_data(cur, nces_id):
     def query_sex_enrollment_counts():
         table = sql.Identifier('nces_enrollment_counts')
 
@@ -115,13 +117,19 @@ def get_enrollment_by_grade_by_sex(cur, nces_id):
 
     cur.execute(query_sex_enrollment_counts())
 
-    enrollment_by_grade_by_sex = {}
+    grades = set()
+    enrollment_by_sex_by_grade = {}
     for grade, sex, total in cur.fetchall():
-        by_sex = enrollment_by_grade_by_sex.get(grade, {})
-        by_sex[sex] = total
-        enrollment_by_grade_by_sex[grade] = by_sex
+        grades.add(grade)
+        by_grade = enrollment_by_sex_by_grade.get(sex, {})
+        by_grade[grade] = total
+        by_grade['total'] = by_grade.get('total', 0) + total
+        enrollment_by_sex_by_grade[sex] = by_grade
 
-    return enrollment_by_grade_by_sex
+    return {
+        'enrollment_by_sex_by_grade': enrollment_by_sex_by_grade,
+        'grades': sorted(grades, key=lambda x: GRADES_ORDER.index(x))
+    }
 
 def get_enrollment_by_grade_by_race(cur, nces_id):
     def query_race_enrollment_counts():

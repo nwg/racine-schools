@@ -219,27 +219,34 @@ ul.schools-tables {
         <li>Private School Enrollment by Race not available</li>
         {% endif %}
 
-        {% if enrollment_by_grade_by_sex is defined and enrollment_by_grade_by_sex %}
+        {% if enrollment_grade_sex_data is defined and enrollment_grade_sex_data %}
+        {% set grades = enrollment_grade_sex_data.grades %}
+        {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
         <li>
             <table>
-                <caption>Students per Grade by Gender (2017-2018)</caption>
+                <caption>Students by Gender by Grade (2017-2018)</caption>
                 <tr>
-                    <th scope="col">Grade</th>
                     <th scope="col">Gender</th>
-                    <th scope="col">Count</th>
+                    {% for grade in grades %}
+                    <th scope="col">{{grade}}</th>
+                    {% endfor %}
+                    <th scope="col">Total</th>
                 </tr>
 
-                {% for grade in grade_order if grade in enrollment_by_grade_by_sex %}
                 <tr>
-                    <td rowspan="2">{{grade}}</td>
                     <td>F</td>
-                    <td>{{enrollment_by_grade_by_sex[grade]['F']}}</td>
+                    {% for grade in grades %}
+                    <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
+                    {% endfor %}
+                    <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
                 </tr>
                 <tr>
                     <td>M</td>
-                    <td>{{enrollment_by_grade_by_sex[grade]['M']}}</td>
+                    {% for grade in grades %}
+                    <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
+                    {% endfor %}
+                    <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
                 </tr>
-                {% endfor %}
             </table>
         </li>
         {% else %}
