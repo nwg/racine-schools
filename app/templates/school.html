@@ -290,27 +290,30 @@ ul.schools-tables {
         <li>Enrollment by grade by race not available</li>
         {% endif %}
 
-        {% if staff_by_category_by_sex is defined and staff_by_category_by_sex %}
+        {% if staff_by_sex_by_category is defined and staff_by_sex_by_category %}
+        {% set cols = category_order + ['Total'] %}
         <li>
             <table>
-                <caption>Staff per Category by Gender (2018-2019)</caption>
+                <caption>Staff by Gender by Category (2018-2019)</caption>
                 <tr>
-                    <th scope="col">Category</th>
-                    <th scope="col">Gender</th>
-                    <th scope="col">Count</th>
+                    <th scope="col">Sex</th>
+                    {% for category in cols %}
+                    <th scope="col">{{category}}</th>
+                    {% endfor %}
                 </tr>
 
-                {% for category in category_order if category in staff_by_category_by_sex %}
                 <tr>
-                    <td rowspan="2">{{category}}</td>
                     <td>F</td>
-                    <td>{{staff_by_category_by_sex[category]['F']}}</td>
+                    {% for category in cols %}
+                    <td>{{staff_by_sex_by_category['F'][category]}}</td>
+                    {% endfor %}
                 </tr>
                 <tr>
                     <td>M</td>
-                    <td>{{staff_by_category_by_sex[category]['M']}}</td>
+                    {% for category in cols %}
+                    <td>{{staff_by_sex_by_category['M'][category]}}</td>
+                    {% endfor %}
                 </tr>
-                {% endfor %}
             </table>
         </li>
         {% else %}

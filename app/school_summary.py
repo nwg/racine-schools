@@ -28,6 +28,14 @@ EDUCATION_MAP = {
     None: 'unreported',
 }
 
+STAFF_CATEGORIES = (
+    'Teachers',
+    'Administrators',
+    'Aides / Paraprofessionals',
+    'Pupil Services',
+    'Other',
+)
+
 GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
 
 def render_school_summary_with_name(name):
@@ -39,7 +47,7 @@ def render_school_summary_with_name(name):
 
     d = {}
     if state_lea_id and state_school_id:
-        d['staff_by_category_by_sex'] = get_staff_by_category_by_sex(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+        d['staff_by_sex_by_category'] = get_staff_by_sex_by_category(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
         d['staff_by_category_by_education'] = get_staff_by_category_by_education(cur, state_lea_id, state_school_id)
         d['staff_by_category_by_tenure'] = get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id)
 
@@ -167,7 +175,7 @@ def get_enrollment_by_grade_by_race(cur, nces_id):
 
     return enrollment_by_grade_by_race
 
-def get_staff_by_category_by_sex(cur, year, state_lea_id, state_school_id):
+def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
     table = sql.Identifier('appointments')
 
     where = andd([
@@ -182,16 +190,19 @@ def get_staff_by_category_by_sex(cur, year, state_lea_id, state_school_id):
 
     cur.execute(query)
 
-    staff_by_category_by_sex = {}
+    staff_by_sex_by_category = {}
     for category, gender, count in cur.fetchall():
-        by_sex = staff_by_category_by_sex.get(category, {})
-        by_sex[gender] = count
-        staff_by_category_by_sex[category] = by_sex
+        by_category = staff_by_sex_by_category.get(gender, {})
+        by_category[category] = count
+        staff_by_sex_by_category[gender] = by_category
 
-    if not staff_by_category_by_sex:
-        return None
-
-    return staff_by_category_by_sex
+    for sex in ('M', 'F'):
+        for category in STAFF_CATEGORIES:
+            by_category = staff_by_sex_by_category.get(sex, {})
+            if category not in by_category:
+                by_category[category] = 0
+            by_category['Total'] = by_category.get('Total', 0) + by_category[category]
+    return staff_by_sex_by_category
 
 def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
     table = sql.Identifier('appointments')
