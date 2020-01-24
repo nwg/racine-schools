@@ -91,6 +91,12 @@ def get_int(s):
 conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
 cur = conn.cursor()
 
+q = """select distinct year from nces_enrollment_counts where year=%s"""
+cur.execute(q, [args.year])
+if cur.fetchall():
+    print(f'Already imported nces for year {args.year}')
+    sys.exit(0)
+
 '''
 def keys():
     with open(args.directory, newline='') as csvfile:
