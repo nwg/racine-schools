@@ -40,10 +40,14 @@ GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06'
 
 def render_school_summary_with_name(name):
     school = db.school_with_name(name)
+    school = dict(school)
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
     nces_id = school['nces_id']
     ppin = school['pss_ppin']
+
+    assert state_lea_id in ('4620', '8110'), 'Unrecognized Racine LEA ID'
+    school['district_name'] = 'Racine Unified' if state_lea_id == '4620' else '21st Century Preparatory School'
 
     d = {}
     if state_lea_id and state_school_id:
