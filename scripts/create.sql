@@ -36,6 +36,7 @@ create table schools (
     logo text,
     disadvantaged_pct NUMERIC(4, 2),
     curriculum_focus text,
+    choice_students_pct NUMERIC(4, 2),
     num_students integer,
     num_grade_levels integer,
     UNIQUE (state_lea_id, state_school_id),

@@ -51,6 +51,7 @@ def schools():
             d['disadvantaged_pct'] = row['Economically Disadvantaged'] or None
             d['curriculum_focus'] = row['Curriculum Focus'] or None
             d['num_students'] = row['Num Students'] or None
+            d['choice_students_pct'] = row['Percent Choice Students'] or None
 
             yield d
 
