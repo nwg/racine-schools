@@ -225,6 +225,46 @@ table.missing-data {
     margin-bottom: 2em;
 }
 
+#ric-footer {
+  overflow: hidden;
+  width: 50%;
+}
+
+#ric-footer-caption {
+    font-size: .625rem;
+    display: inline-block;
+    margin-top: 2em;
+}
+
+#ric-footer-left {
+  float: left;
+  background-color: orange;
+  padding-bottom: 500em;
+  margin-bottom: -500em;
+}
+
+#ric-footer-right {
+  float: left;
+  width: 70%;
+  margin-right: -1px; /* Thank you IE */
+  margin-left: 1rem;
+  padding-bottom: 500em;
+  margin-bottom: -500em;
+  line-height: 1.25;
+  display: table;
+}
+
+#ric-footer-anchor, #ric-footer-anchor img {
+    vertical-align: bottom;
+    text-decoration: none !important;
+    border:0px !important;
+    outline:none;
+    border-width: 0px;
+    outline-width:0px;
+    border-bottom: none;
+}
+
+
 </style>
     <head>
         <title>{{school['longname']}}</title>
@@ -742,9 +782,18 @@ table.missing-data {
                     {% endif %}
                 </div>
             </div>
-
         </div>
 
+        <div id="footer">
+            <div id="ric-footer">
+                <div id="ric-footer-left">
+                    <a id="ric-footer-anchor" href="http://ricracine.org"><img id="ric-footer-image" src="https://racineschools.s3.amazonaws.com/static/ric-logo.jpg" /></a>
+                </div>
+                <div id="ric-footer-right">
+                    <span id="ric-footer-caption">RacineSchools.com is a special project of the Racine Interfaith Coalition's Education Taskforce.<br />The Racine Interfaith Coalition is a 501(c)(3) non-profit organization made up of 27 congregations who are united in our belief in the inherent value of every individual and our shared obligation to create a fairer, more equitable and more just community.</span>
+                </div>
+            </div>
+        </div>
     </body>
 </html>
 
