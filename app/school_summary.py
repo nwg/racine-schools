@@ -55,7 +55,7 @@ def render_school_summary_with_name(name):
     tables = {}
     missing = {}
 
-    t, m = student_tables(nces_id, ppin)
+    t, m = student_tables(school['is_private'], nces_id, ppin)
     tables['student'] = t
     missing['student'] = m
 
@@ -100,18 +100,18 @@ def discipline_tables(nces_id):
         if discipline_by_type_by_sex != None:
             tables['discipline_by_type_by_sex'] = ocrdict(table=discipline_by_type_by_sex)
         else:
-            missing['discipline_by_type_by_sex'] = missing_ocr
+            missing['discipline_by_type_by_sex'] = ocrdict()
 
         discipline_by_type_by_race = get_discipline_by_type_by_race(cur, MOST_RECENT_OCR_YEAR, nces_id)
         if discipline_by_type_by_race != None:
             tables['discipline_by_type_by_race'] = ocrdict(table=discipline_by_type_by_race)
         else:
-            missing['discipline_by_type_by_race'] = missing_ocr
+            missing['discipline_by_type_by_race'] = ocrdict()
 
     return tables, missing
 
 
-def student_tables(nces_id, ppin):
+def student_tables(is_private, nces_id, ppin):
     tables = {}
     missing = {}
 
@@ -127,7 +127,7 @@ def student_tables(nces_id, ppin):
     if ppin:
         tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin))
         tables['pss_enrollment_by_demographic'] = pssdict(table=get_pss_enrollment_by_demographic(cur, MOST_RECENT_PSS_YEAR, ppin))
-    else:
+    elif is_private:
         missing['pss_enrollment_by_grade'] = pssdict()
         missing['pss_enrollment_by_demographic'] = pssdict()
 

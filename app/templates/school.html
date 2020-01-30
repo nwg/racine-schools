@@ -24,6 +24,17 @@
 {% set private_affiliation = 'Independent' %}
 {% endif %}
 {% set public_affiliation = school.district_name %}
+{% set id_longname_map = dict([
+    ('pss_enrollment_by_grade', 'Enrollment By Grade'),
+    ('pss_enrollment_by_demographic', 'Enrollment by Race and Gender'),
+    ('enrollment_grade_sex_data', 'Enrollment by Grade and Gender'),
+    ('enrollment_by_grade_by_race', 'Enrollment by Grade and Race'),
+    ('discipline_by_type_by_sex', 'Discipline by Type by Sex'),
+    ('discipline_by_type_by_race', 'Discipline by Type by Race'),
+    ('staff_by_sex_by_category', 'Staff by Sex by Category'),
+    ('staff_by_category_by_education', 'Staff by Category by Education'),
+    ('staff_by_category_by_tenure', 'Staff by Category by Tenure'),
+]) %}
 
 <html>
 <style type="text/css">
@@ -210,6 +221,9 @@ div.section-table-list div.data-table:first-child {
     margin-top: 0;
 }
 
+table.missing-data {
+    margin-bottom: 2em;
+}
 
 </style>
     <head>
@@ -252,7 +266,9 @@ div.section-table-list div.data-table:first-child {
 
                 <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
                 <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
+                {% if school.disadvantaged_pct %}
                 <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
+                {% endif %}
                 <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
                 {% if school.choice_students_pct %}
                 <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
@@ -316,6 +332,24 @@ div.section-table-list div.data-table:first-child {
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
                 </div>
 
+                {% if missing.student %}
+                <table class="missing-data">
+                    <caption>Ø Missing Student Data</caption>
+                    <tr>
+                        <th scope="col">Table</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Year</th>
+                    </tr>
+                    {% for id, data in missing.student.items() %}
+                    <tr>
+                        <td>{{id_longname_map[id]}}</td>
+                        <td><a href="{{data.url}}">{{data.source}}</a></td>
+                        <td>{{data.year}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+
                 <div class="section-table-list">
                     {% if tables.student.pss_enrollment_by_grade %}
                     {% set pss_enollment_by_grade = tables.student.pss_enrollment_by_grade %}
@@ -346,8 +380,6 @@ div.section-table-list div.data-table:first-child {
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
 
-                    {% elif school.is_private %}
-                    <span>Private School Enrollment by Grade not available</span>
                     {% endif %}
 
                     {% if tables.student.pss_enrollment_by_demographic %}
@@ -377,8 +409,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% elif school.is_private %}
-                    <span>Private School Enrollment by Race not available</span>
                     {% endif %}
 
                     {% if tables.student.pss_enrollment_by_demographic %}
@@ -403,8 +433,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% elif school.is_private %}
-                    <span>Private School Enrollment by Gender not available</span>
                     {% endif %}
 
                     {% if tables.student.enrollment_grade_sex_data %}
@@ -498,6 +526,24 @@ div.section-table-list div.data-table:first-child {
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
                 </div>
 
+                {% if missing.staff %}
+                <table class="missing-data">
+                    <caption>Ø Missing Staff Data</caption>
+                    <tr>
+                        <th scope="col">Table</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Year</th>
+                    </tr>
+                    {% for id, data in missing.staff.items() %}
+                    <tr>
+                        <td>{{id_longname_map[id]}}</td>
+                        <td><a href="{{data.url}}">{{data.source}}</a></td>
+                        <td>{{data.year}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+
                 <div class="section-table-list">
                     {% if tables.staff.staff_by_sex_by_category %}
                     {% set staff_by_sex_by_category = tables.staff.staff_by_sex_by_category.table %}
@@ -530,8 +576,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% else %}
-                    <span>Staff by category by sex not available</span>
                     {% endif %}
 
                     {% if tables.staff.staff_by_category_by_education %}
@@ -561,8 +605,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% else %}
-                    <span>Staff by category by education not available</span>
                     {% endif %}
 
                     {% if tables.staff.staff_by_category_by_tenure %}
@@ -604,6 +646,25 @@ div.section-table-list div.data-table:first-child {
                 <div class="section-label">
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
                 </div>
+
+                {% if missing.discipline %}
+                <table class="missing-data">
+                    <caption>Ø Missing Discipline Data</caption>
+                    <tr>
+                        <th scope="col">Table</th>
+                        <th scope="col">Source</th>
+                        <th scope="col">Year</th>
+                    </tr>
+                    {% for id, data in missing.discipline.items() %}
+                    <tr>
+                        <td>{{id_longname_map[id]}}</td>
+                        <td><a href="{{data.url}}">{{data.source}}</a></td>
+                        <td>{{data.year}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% endif %}
+
                 <div class="section-table-list">
                     {% if tables.discipline.discipline_by_type_by_sex %}
                     {% set discipline_by_type_by_sex = tables.discipline.discipline_by_type_by_sex.table %}
@@ -635,8 +696,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% else %}
-                    <span>Discipline by type by sex not available</span>
                     {% endif %}
 
                     {% if tables.discipline.discipline_by_type_by_race %}
@@ -680,8 +739,6 @@ div.section-table-list div.data-table:first-child {
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
-                    {% else %}
-                    <span>Discipline by type by race not available</span>
                     {% endif %}
                 </div>
             </div>
