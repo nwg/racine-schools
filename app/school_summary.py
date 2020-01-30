@@ -6,6 +6,9 @@ from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
 
 MOST_RECENT_STAFF_YEAR = 2018
+MOST_RECENT_PSS_YEAR = 2017
+MOST_RECENT_NCES_YEAR = 2017
+MOST_RECENT_OCR_YEAR = 2015
 
 RACE_COLS = [
     'american_indian_or_alaska_native',
@@ -49,28 +52,147 @@ def render_school_summary_with_name(name):
     assert state_lea_id in ('4620', '8110'), 'Unrecognized Racine LEA ID'
     school['district_name'] = 'Racine Unified' if state_lea_id == '4620' else '21st Century Preparatory School'
 
-    d = {}
-    if state_lea_id and state_school_id:
-        d['staff_by_sex_by_category'] = get_staff_by_sex_by_category(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
-        d['staff_by_category_by_education'] = get_staff_by_category_by_education(cur, state_lea_id, state_school_id)
-        d['staff_by_category_by_tenure'] = get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id)
+    tables = {}
+    missing = {}
 
-    if nces_id:
-        d['discipline_by_type_by_sex'] = get_discipline_by_type_by_sex(cur, nces_id)
-        d['discipline_by_type_by_race'] = get_discipline_by_type_by_race(cur, nces_id)
-        d['enrollment_grade_sex_data'] = get_enrollment_grade_sex_data(cur, nces_id)
-        d['enrollment_by_grade_by_race'] = get_enrollment_by_grade_by_race(cur, nces_id)
+    t, m = student_tables(nces_id, ppin)
+    tables['student'] = t
+    missing['student'] = m
 
-    if ppin:
-        d['pss_info'] = get_pss_info(cur, ppin)
-        d['pss_enrollment_by_grade'] = get_pss_enrollment_by_grade(cur, ppin)
-        d['pss_enrollment_by_demographic'] = get_pss_enrollment_by_demographic(cur, ppin)
+    t, m = staff_tables(state_lea_id, state_school_id)
+    tables['staff'] = t
+    missing['staff'] = m
+
+    t, m = discipline_tables(nces_id)
+    tables['discipline'] = t
+    missing['discipline'] = m
 
     return render_template(
         'school.html',
         school=school,
-        **d
+        tables=tables,
+        missing=missing
     )
+
+DPI_STAFF_WEBSITE = "https://publicstaffreports.dpi.wi.gov/PubStaffReport/Public/PublicReport/AllStaffReport"
+PSS_SURVEY_WEBSITE = "https://nces.ed.gov/surveys/pss/pssdata.asp"
+NCES_SCHOOL_WEBSITE = "https://nces.ed.gov/ccd/pubschuniv.asp"
+OCR_WEBSITE = "https://ocrdata.ed.gov/"
+
+def discipline_tables(nces_id):
+    tables = {}
+    missing = {}
+
+    def ocrdict(**extra):
+        ocr = {
+            'source': 'ocr',
+            'url': OCR_WEBSITE,
+            'year': MOST_RECENT_OCR_YEAR,
+        }
+        ocr.update(extra)
+        return ocr
+
+    if nces_id == None:
+        missing['discipline_by_type_by_sex'] = ocrdict()
+        missing['discipline_by_type_by_race'] = ocrdict()
+    else:
+        discipline_by_type_by_sex = get_discipline_by_type_by_sex(cur, MOST_RECENT_OCR_YEAR, nces_id)
+        if discipline_by_type_by_sex != None:
+            tables['discipline_by_type_by_sex'] = ocrdict(table=discipline_by_type_by_sex)
+        else:
+            missing['discipline_by_type_by_sex'] = missing_ocr
+
+        discipline_by_type_by_race = get_discipline_by_type_by_race(cur, MOST_RECENT_OCR_YEAR, nces_id)
+        if discipline_by_type_by_race != None:
+            tables['discipline_by_type_by_race'] = ocrdict(table=discipline_by_type_by_race)
+        else:
+            missing['discipline_by_type_by_race'] = missing_ocr
+
+    return tables, missing
+
+
+def student_tables(nces_id, ppin):
+    tables = {}
+    missing = {}
+
+    def pssdict(**extra):
+        d = {
+            'source': 'pss',
+            'url': PSS_SURVEY_WEBSITE,
+            'year': MOST_RECENT_PSS_YEAR
+        }
+        d.update(extra)
+        return d
+
+    if ppin:
+        tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin))
+        tables['pss_enrollment_by_demographic'] = pssdict(table=get_pss_enrollment_by_demographic(cur, MOST_RECENT_PSS_YEAR, ppin))
+    else:
+        missing['pss_enrollment_by_grade'] = pssdict()
+        missing['pss_enrollment_by_demographic'] = pssdict()
+
+    def ncesdict(**extra):
+        d = {
+            'source': 'nces',
+            'url': NCES_SCHOOL_WEBSITE,
+            'year': MOST_RECENT_NCES_YEAR
+        }
+        d.update(extra)
+        return d
+
+    if nces_id == None:
+        missing['enrollment_grade_sex_data'] = ncesdict()
+        missing['enrollment_by_grade_by_race'] = ncesdict()
+    else:
+        enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, nces_id)
+        if enrollment_grade_sex_data == None:
+            missing['enrollment_grade_sex_data'] = ncesdict()
+        else:
+            tables['enrollment_grade_sex_data'] = ncesdict(table=enrollment_grade_sex_data)
+
+        enrollment_by_grade_by_race = get_enrollment_by_grade_by_race(cur, MOST_RECENT_NCES_YEAR, nces_id)
+        if enrollment_by_grade_by_race == None:
+            missing['enrollment_by_grade_by_race'] = ncesdict()
+        else:
+            tables['enrollment_by_grade_by_race'] = ncesdict(table=enrollment_by_grade_by_race)
+
+    return tables, missing
+
+def staff_tables(state_lea_id, state_school_id):
+    tables = {}
+    missing = {}
+
+    def dpidict(**extra):
+        d = {
+            'source': 'dpi',
+            'url': DPI_STAFF_WEBSITE,
+            'year': MOST_RECENT_STAFF_YEAR
+        }
+        d.update(extra)
+        return d
+
+    if not state_lea_id or not state_school_id:
+        missing['staff_by_sex_by_category'] = dpidict()
+        missing['staff_by_category_by_education'] = dpidict()
+        missing['staff_by_category_by_tenure'] = dpidict()
+
+        return tables, missing
+
+    staff_by_sex_by_category = get_staff_by_sex_by_category(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    if staff_by_sex_by_category == None:
+        missing['staff_by_sex_by_category'] = dpidict()
+    else:
+        tables['staff_by_sex_by_category'] = dpidict(table=staff_by_sex_by_category)
+
+    staff_by_category_by_education = get_staff_by_category_by_education(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    if staff_by_category_by_education != None:
+        tables['staff_by_category_by_education'] = dpidict(table=staff_by_category_by_education)
+    else:
+        missing['staff_by_category_by_education'] = dpidict()
+
+    tables['staff_by_category_by_tenure'] = dpidict(table=get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id))
+
+    return tables, missing
 
 def get_pss_info(cur, ppin):
     def query_pss_info():
@@ -112,12 +234,21 @@ def get_pss_enrollment_by_demographic(cur, ppin):
     return cur.fetchone()
 
 
-def get_enrollment_grade_sex_data(cur, nces_id):
+def get_enrollment_grade_sex_data(cur, year, nces_id):
+    check_where = andd([
+        idequals('year', year),
+        idequals('nces_id', nces_id)
+    ])
+    query = select('nces_enrollment_counts', '*', where=check_where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     def query_sex_enrollment_counts():
         table = sql.Identifier('nces_enrollment_counts')
 
         where = andd([
-            idequals('year', 2017),
+            idequals('year', year),
             idequals('nces_id', nces_id)
         ])
 
@@ -143,12 +274,21 @@ def get_enrollment_grade_sex_data(cur, nces_id):
         'grades': sorted(grades, key=lambda x: GRADES_ORDER.index(x))
     }
 
-def get_enrollment_by_grade_by_race(cur, nces_id):
+def get_enrollment_by_grade_by_race(cur, year, nces_id):
+    check_where = andd([
+        idequals('year', year),
+        idequals('nces_id', nces_id)
+    ])
+    query = select('nces_enrollment_counts', '*', where=check_where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     def query_race_enrollment_counts():
         table = sql.Identifier('nces_enrollment_counts')
 
         where = andd([
-            idequals('year', 2017),
+            idequals('year', year),
             idequals('nces_id', nces_id)
         ])
 
@@ -180,8 +320,18 @@ def get_enrollment_by_grade_by_race(cur, nces_id):
     return enrollment_by_grade_by_race
 
 def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
-    table = sql.Identifier('appointments')
+    check_where = andd([
+        idequals('year', year),
+        idequals('state_lea_id', state_lea_id),
+        idequals('state_school_id', state_school_id)
+    ])
 
+    query = select('appointments', '*', where=check_where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
+    table = sql.Identifier('appointments')
     where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
@@ -208,11 +358,22 @@ def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
             by_category['Total'] = by_category.get('Total', 0) + by_category[category]
     return staff_by_sex_by_category
 
-def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
+def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id):
+    check_where = andd([
+        idequals('year', year),
+        idequals('state_lea_id', state_lea_id),
+        idequals('state_school_id', state_school_id)
+    ])
+
+    query = select('appointments', '*', where=check_where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     table = sql.Identifier('appointments')
 
     where = andd([
-        idequals('year', 2018),
+        idequals('year', year),
         idequals('state_lea_id', state_lea_id),
         idequals('state_school_id', state_school_id),
     ])
@@ -280,9 +441,6 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
             by_tenure[key] = count
             staff_by_category_by_tenure[category] = by_tenure
 
-    if not staff_by_category_by_tenure:
-        return None
-
     return staff_by_category_by_tenure
 
 iss_categories = [
@@ -302,8 +460,12 @@ referral_categories = [
     'SWOD: Referral to law enforcement',
 ]
 
-def get_discipline_by_type_by_sex(cur, nces_id):
-    query = select('discipline_counts', '*', where=idequals('nces_id', nces_id))
+def get_discipline_by_type_by_sex(cur, year, nces_id):
+    check_where = andd([
+        idequals('nces_id', nces_id),
+        idequals('year', year)
+    ])
+    query = select('discipline_counts', '*', where=check_where)
     cur.execute(query)
     if not cur.fetchone():
         return None
@@ -317,7 +479,7 @@ def get_discipline_by_type_by_sex(cur, nces_id):
             table,
             andd([
                 idequals('nces_id', nces_id),
-                idequals('year', 2015),
+                idequals('year', year),
                 orr_categories]))
         return statement
 
@@ -338,8 +500,12 @@ def get_discipline_by_type_by_sex(cur, nces_id):
 
     return by_type_by_sex
 
-def get_discipline_by_type_by_race(cur, nces_id):
-    query = select('discipline_counts', '*', where=idequals('nces_id', nces_id))
+def get_discipline_by_type_by_race(cur, year, nces_id):
+    check_where = andd([
+        idequals('nces_id', nces_id),
+        idequals('year', year)
+    ])
+    query = select('discipline_counts', '*', where=check_where)
     cur.execute(query)
     if not cur.fetchone():
         return None
@@ -359,6 +525,7 @@ def get_discipline_by_type_by_race(cur, nces_id):
             table,
             andd([
                 idequals('nces_id', nces_id),
+                idequals('year', year),
                 orr_categories]))
         return statement
 
