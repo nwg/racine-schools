@@ -300,6 +300,26 @@ a.header-block:hover {
     color: #c0bec5;
 }
 
+#header {
+    height: 4rem;
+}
+
+#apple-logo {
+    display: inline-block;
+    float: right;
+    padding-right: 5%;
+}
+
+#home-anchor, #home-anchor img {
+    vertical-align: bottom;
+    text-decoration: none !important;
+    border:0px !important;
+    outline:none;
+    border-width: 0px;
+    outline-width:0px;
+    border-bottom: none;
+}
+
 
 </style>
     <head>
@@ -307,11 +327,13 @@ a.header-block:hover {
     </head>
     <body>
         <div id="header">
-            <div style="min-height: 8px;"></div>
-            <div style="margin-left: 19.66%;">
+            <div style="margin-left: 19.66%; margin-top: 8px; display: inline-block;">
                 <a class="header-block nostyle" href="http://racineschools.com/about/"><span class="header-link">About</a></span></a>
                 <a class="header-block nostyle" href="http://racineschools.com/contact/"><span class="header-link">Contact</span></a>
                 <a class="header-block nostyle" href="http://racineschools.com/donate/"><span class="header-link">Donate</span></a>
+            </div>
+            <div id="apple-logo">
+                <a id="home-anchor" href="http://racineschools.com"><img width="165" height="105" id="home-image" src="https://racineschools.s3.amazonaws.com/static/racine-schools-logo.jpg" /></a>
             </div>
         </div>
         <img src="{{school.logo}}" />
