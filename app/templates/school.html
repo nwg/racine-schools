@@ -28,6 +28,13 @@
 <html>
 <style type="text/css">
 
+hr {
+    border: none;
+    height: 16px;
+    color: black;
+    background-color: black;
+}
+
 body {
     font-family: Arial;
     font-size: 16pt;
@@ -78,18 +85,6 @@ table {
     font-size: .8rem;
 }
 
-ul#schools-tables {
-    list-style: none;
-}
-
-#schools-tables li {
-    margin-top: 10px;
-}
-
-#schools-tables li:first-child {
-    margin-top:0;
-}
-
 div.small-summary {
     padding: 0 0 0 0;
     font-size: 16pt;
@@ -101,6 +96,7 @@ div.small-summary span {
 
 body {
     margin-left: 72px;
+    margin-right: 72px;
 }
 
 #summary {
@@ -134,6 +130,7 @@ body {
 #summary-info {
     font-size: 16pt;
     margin-top: 8px;
+    margin-bottom: 4rem;
 }
 
 #summary-info span {
@@ -145,7 +142,7 @@ body {
     margin-top:0;
 }
 
-#schools-tables span {
+#schools-tables > span {
     display: block;
 }
 
@@ -163,6 +160,41 @@ a {
     border-bottom: solid 1px currentColor;
     text-decoration: none;
     padding: 0;
+}
+
+div.section-label {
+    width: 45%;
+    height: 6rem;
+    background-color: #c90500;
+    color: #ffffff;
+}
+
+div.section-label span {
+    display: inline-block;
+    line-height: 6rem;
+    vertical-align: middle;
+}
+
+div.section-label span.section-label-icon {
+    margin-left: 2.5rem;
+    font-size: 5rem;
+    line-height: 5rem;
+    margin-bottom: 1rem;
+}
+
+div.section-label span.section-label-title {
+    margin-left: 1.5rem;
+    font-size: 2.25rem;
+    font-weight: bold;
+}
+
+div.section-label {
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+}
+
+div.table-section {
+    margin-bottom: 4rem;
 }
 
 </style>
@@ -211,6 +243,52 @@ a {
                 {% if school.choice_students_pct %}
                 <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
                 {% endif %}
+
+                {% if pss_info is defined and pss_info %}
+                <table>
+                    <caption>Private School Data</caption>
+                    <tr>
+                        <th scope="row">Kindergarten Hours</td>
+                        <td>{{pss_info.kg_hours}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Kindergarten Days Per Week</td>
+                        <td>{{pss_info.kg_days_per_week}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Is Religious</td>
+                        <td>{% if pss_info.is_religious %}Yes{% else %}No{% endif %}</td>
+                    </tr>
+                    {% if pss_info.is_religious %}
+                    <tr>
+                        <th scope="row">Orientation</th>
+                        <td>{{pss_info.label}}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th scope="row">Days in School Year</th>
+                        <td>{{pss_info.days_in_year}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Time in School Day</th>
+                        <td>{{"%02d"|format(pss_info.hours_in_day)}}:{{"%02d"|format(pss_info.minutes_in_day)}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Num Students</th>
+                        <td>{{pss_info.enrollment}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Num Full-Time Teachers</th>
+                        <td>{{pss_info.num_fte_teachers}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Student-Teacher Ratio</th>
+                        <td>{{"%.02f"|format(pss_info.enrollment/pss_info.num_fte_teachers)}}</td>
+                    </tr>
+                </table>
+                {% elif school.is_private %}
+                <span>Private School Data not available</span>
+                {% endif %}
             </div>
 
 
@@ -218,327 +296,304 @@ a {
 
         <hr />
 
-        <div id="schools-tables">
-        {% if pss_info is defined and pss_info %}
-        <table>
-            <caption>Private School Data</caption>
-            <tr>
-                <th scope="row">Kindergarten Hours</td>
-                <td>{{pss_info.kg_hours}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Kindergarten Days Per Week</td>
-                <td>{{pss_info.kg_days_per_week}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Is Religious</td>
-                <td>{% if pss_info.is_religious %}Yes{% else %}No{% endif %}</td>
-            </tr>
-            {% if pss_info.is_religious %}
-            <tr>
-                <th scope="row">Orientation</th>
-                <td>{{pss_info.label}}</td>
-            </tr>
-            {% endif %}
-            <tr>
-                <th scope="row">Days in School Year</th>
-                <td>{{pss_info.days_in_year}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Time in School Day</th>
-                <td>{{"%02d"|format(pss_info.hours_in_day)}}:{{"%02d"|format(pss_info.minutes_in_day)}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Num Students</th>
-                <td>{{pss_info.enrollment}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Num Full-Time Teachers</th>
-                <td>{{pss_info.num_fte_teachers}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Student-Teacher Ratio</th>
-                <td>{{"%.02f"|format(pss_info.enrollment/pss_info.num_fte_teachers)}}</td>
-            </tr>
-        </table>
-        {% else %}
-        <span>Private School Data not available</span>
-        {% endif %}
+            <div id="schools-tables">
+                <div class="table-section">
+                    <div class="section-label">
+                        <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
+                    </div>
 
-        {% if pss_enrollment_by_grade is defined and pss_enrollment_by_grade %}
-        <table>
-            <caption>Private School Enrollment by Grade</caption>
-            <tr>
-                <th scope="row">Grade</th>
-                {% for grade in grade_order if grade in pss_enrollment_by_grade %}
-                <th scope="col">{{grade}}</th>
-                {% endfor %}
-                {% if pss_info is defined and pss_info %}
-                <th scope="col">Total</th>
-                {% endif %}
-            </tr>
-                <th scope="row">Enrollment</th>
-                {% for grade in grade_order if grade in pss_enrollment_by_grade %}
-                <td>{{pss_enrollment_by_grade[grade]}}</td>
-                {% endfor %}
-                {% if pss_info is defined and pss_info %}
-                <td>{{pss_info.enrollment}}</td>
-                {% endif %}
-            </tr>
-        </table>
-        {% else %}
-        <span>Private School Enrollment by Grade not available</span>
-        {% endif %}
+                    {% if pss_enrollment_by_grade is defined and pss_enrollment_by_grade %}
+                    <table>
+                        <caption>Private School Enrollment by Grade</caption>
+                        <tr>
+                            <th scope="row">Grade</th>
+                            {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                            <th scope="col">{{grade}}</th>
+                            {% endfor %}
+                            {% if pss_info is defined and pss_info %}
+                            <th scope="col">Total</th>
+                            {% endif %}
+                        </tr>
+                            <th scope="row">Enrollment</th>
+                            {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                            <td>{{pss_enrollment_by_grade[grade]}}</td>
+                            {% endfor %}
+                            {% if pss_info is defined and pss_info %}
+                            <td>{{pss_info.enrollment}}</td>
+                            {% endif %}
+                        </tr>
+                    </table>
+                    {% elif school.is_private %}
+                    <span>Private School Enrollment by Grade not available</span>
+                    {% endif %}
 
-        {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
-        <table>
-            <caption>Private School Enrollment by Race (KG and Up)</caption>
-            <tr>
-                <th scope="row">Race</th>
-                <th scope="col">American Indian or Alaska Native</th>
-                <th scope="col">Asian</th>
-                <th scope="col">Hawaiian or Pacific Islander</th>
-                <th scope="col">Hispanic</th>
-                <th scope="col">Black</th>
-                <th scope="col">White</th>
-                <th scope="col">Two or More Races</th>
-                <th scope="col">Total</th>
-            </tr>
-                <th scope="row">Enrollment</th>
-                {% for race in race_order %}
-                <td>{{pss_enrollment_by_demographic[race]}}</td>
-                {% endfor %}
-            </tr>
-        </table>
-        {% else %}
-        <span>Private School Enrollment by Race not available</span>
-        {% endif %}
+                    {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
+                    <table>
+                        <caption>Private School Enrollment by Race (KG and Up)</caption>
+                        <tr>
+                            <th scope="row">Race</th>
+                            <th scope="col">American Indian or Alaska Native</th>
+                            <th scope="col">Asian</th>
+                            <th scope="col">Hawaiian or Pacific Islander</th>
+                            <th scope="col">Hispanic</th>
+                            <th scope="col">Black</th>
+                            <th scope="col">White</th>
+                            <th scope="col">Two or More Races</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                            <th scope="row">Enrollment</th>
+                            {% for race in race_order %}
+                            <td>{{pss_enrollment_by_demographic[race]}}</td>
+                            {% endfor %}
+                        </tr>
+                    </table>
+                    {% elif school.is_private %}
+                    <span>Private School Enrollment by Race not available</span>
+                    {% endif %}
 
-        {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
-        <table>
-            <caption>Private School Enrollment by Gender (KG and Up)</caption>
-            <tr>
-                <th scope="row">Gender</th>
-                <th scope="col">Male</th>
-                <th scope="col">Female</th>
-                <th scope="col">Total</th>
-            </tr>
-                <th scope="row">Enrollment</th>
-                <td>{{pss_enrollment_by_demographic.male}}</td>
-                <td>{{pss_enrollment_by_demographic.female}}</td>
-                <td>{{pss_enrollment_by_demographic.total}}</td>
-            </tr>
-        </table>
-        {% else %}
-        <span>Private School Enrollment by Gender not available</span>
-        {% endif %}
+                    {% if pss_enrollment_by_demographic is defined and pss_enrollment_by_demographic %}
+                    <table>
+                        <caption>Private School Enrollment by Gender (KG and Up)</caption>
+                        <tr>
+                            <th scope="row">Gender</th>
+                            <th scope="col">Male</th>
+                            <th scope="col">Female</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                            <th scope="row">Enrollment</th>
+                            <td>{{pss_enrollment_by_demographic.male}}</td>
+                            <td>{{pss_enrollment_by_demographic.female}}</td>
+                            <td>{{pss_enrollment_by_demographic.total}}</td>
+                        </tr>
+                    </table>
+                    {% elif school.is_private %}
+                    <span>Private School Enrollment by Gender not available</span>
+                    {% endif %}
 
-        {% if enrollment_grade_sex_data is defined and enrollment_grade_sex_data %}
-        {% set grades = enrollment_grade_sex_data.grades %}
-        {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
-        <table>
-            <caption>Students by Gender by Grade (2017-2018)</caption>
-            <tr>
-                <th scope="col">Gender</th>
-                {% for grade in grades %}
-                <th scope="col">{{grade}}</th>
-                {% endfor %}
-                <th scope="col">Total</th>
-            </tr>
+                    {% if enrollment_grade_sex_data is defined and enrollment_grade_sex_data %}
+                    {% set grades = enrollment_grade_sex_data.grades %}
+                    {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
+                    <table>
+                        <caption>Students by Gender by Grade (2017-2018)</caption>
+                        <tr>
+                            <th scope="col">Gender</th>
+                            {% for grade in grades %}
+                            <th scope="col">{{grade}}</th>
+                            {% endfor %}
+                            <th scope="col">Total</th>
+                        </tr>
 
-            <tr>
-                <td>F</td>
-                {% for grade in grades %}
-                <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
-                {% endfor %}
-                <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
-            </tr>
-            <tr>
-                <td>M</td>
-                {% for grade in grades %}
-                <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
-                {% endfor %}
-                <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
-            </tr>
-        </table>
-        {% else %}
-        <span>Enrollment by grade by sex not available</span>
-        {% endif %}
+                        <tr>
+                            <td>F</td>
+                            {% for grade in grades %}
+                            <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
+                            {% endfor %}
+                            <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
+                        </tr>
+                        <tr>
+                            <td>M</td>
+                            {% for grade in grades %}
+                            <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
+                            {% endfor %}
+                            <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
+                        </tr>
+                    </table>
+                    {% else %}
+                    <span>Enrollment by grade by sex not available</span>
+                    {% endif %}
 
-        {% if enrollment_by_grade_by_race is defined and enrollment_by_grade_by_race %}
-        <table>
-            <caption>Students per Grade by Race (2017-2018)</caption>
-            <tr>
-                <th scope="col">Grade</th>
-                <th scope="col">American Indian or Alaska Native</th>
-                <th scope="col">Asian</th>
-                <th scope="col">Hawaiian or Pacific Islander</th>
-                <th scope="col">Hispanic</th>
-                <th scope="col">Black</th>
-                <th scope="col">White</th>
-                <th scope="col">Two or More Races</th>
-                <th scope="col">Total</th>
-            </tr>
+                    {% if enrollment_by_grade_by_race is defined and enrollment_by_grade_by_race %}
+                    <table>
+                        <caption>Students per Grade by Race (2017-2018)</caption>
+                        <tr>
+                            <th scope="col">Grade</th>
+                            <th scope="col">American Indian or Alaska Native</th>
+                            <th scope="col">Asian</th>
+                            <th scope="col">Hawaiian or Pacific Islander</th>
+                            <th scope="col">Hispanic</th>
+                            <th scope="col">Black</th>
+                            <th scope="col">White</th>
+                            <th scope="col">Two or More Races</th>
+                            <th scope="col">Total</th>
+                        </tr>
 
-            {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
-            <tr>
-                <th scope="row">{{grade}}</th>
-                {% for race in race_order %}
-                {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
-                {% if race != 'total' %}
-                <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                        {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                        <tr>
+                            <th scope="row">{{grade}}</th>
+                            {% for race in race_order %}
+                            {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
+                            {% if race != 'total' %}
+                            <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                            {% else %}
+                            <td>{{count}}</td>
+                            {% endif %}
+
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+
+                    </table>
+                    {% else %}
+                    <span>Enrollment by grade by race not available</span>
+                    {% endif %}
+                </div>
+
+            <hr />
+
+            <div class="table-section">
+
+                <div class="section-label">
+                    <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
+                </div>
+
+                {% if staff_by_sex_by_category is defined and staff_by_sex_by_category %}
+                {% set cols = category_order + ['Total'] %}
+                <table>
+                    <caption>Staff by Gender by Category (2018-2019)</caption>
+                    <tr>
+                        <th scope="col">Gender</th>
+                        {% for category in cols %}
+                        <th scope="col">{{category}}</th>
+                        {% endfor %}
+                    </tr>
+
+                    <tr>
+                        <td>F</td>
+                        {% for category in cols %}
+                        <td>{{staff_by_sex_by_category['F'][category]}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <td>M</td>
+                        {% for category in cols %}
+                        <td>{{staff_by_sex_by_category['M'][category]}}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
                 {% else %}
-                <td>{{count}}</td>
+                <span>Staff by category by sex not available</span>
                 {% endif %}
 
-                {% endfor %}
-            </tr>
-            {% endfor %}
+                {% if staff_by_category_by_education is defined and staff_by_category_by_education %}
+                <table>
+                    <caption>Staff per Category by Education Level (2018-2019)</caption>
+                    <tr>
+                        <th scope="col">Category</th>
+                        {% for degree in degree_order %}
+                        <th scope="col">{{degree_map[degree]}}</th>
+                        {% endfor %}
+                    </tr>
 
-        </table>
-        {% else %}
-        <span>Enrollment by grade by race not available</span>
-        {% endif %}
+                    {% for category in category_order if category in staff_by_category_by_education %}
+                    <tr>
+                        <td>{{category}}</td>
+                        {% for degree in degree_order %}
+                        <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
+                        {% endfor %}
+                    </tr>
 
-        {% if staff_by_sex_by_category is defined and staff_by_sex_by_category %}
-        {% set cols = category_order + ['Total'] %}
-        <table>
-            <caption>Staff by Gender by Category (2018-2019)</caption>
-            <tr>
-                <th scope="col">Gender</th>
-                {% for category in cols %}
-                <th scope="col">{{category}}</th>
-                {% endfor %}
-            </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <span>Staff by category by education not available</span>
+                {% endif %}
 
-            <tr>
-                <td>F</td>
-                {% for category in cols %}
-                <td>{{staff_by_sex_by_category['F'][category]}}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>M</td>
-                {% for category in cols %}
-                <td>{{staff_by_sex_by_category['M'][category]}}</td>
-                {% endfor %}
-            </tr>
-        </table>
-        {% else %}
-        <span>Staff by category by sex not available</span>
-        {% endif %}
+                {% if staff_by_category_by_tenure is defined and staff_by_category_by_tenure %}
+                <table>
+                    <caption>Staff per Category by Tenure at School (Until 2018-2019)</caption>
+                    <tr>
+                        <th scope="col">Category</th>
+                        {% for tenure in tenure_order %}
+                        <th scope="col">{{tenure_map[tenure]}}</th>
+                        {% endfor %}
+                    </tr>
 
-        {% if staff_by_category_by_education is defined and staff_by_category_by_education %}
-        <table>
-            <caption>Staff per Category by Education Level (2018-2019)</caption>
-            <tr>
-                <th scope="col">Category</th>
-                {% for degree in degree_order %}
-                <th scope="col">{{degree_map[degree]}}</th>
-                {% endfor %}
-            </tr>
+                    {% for category in category_order if category in staff_by_category_by_tenure %}
+                    <tr>
+                        <td>{{category}}</td>
+                        {% for tenure in tenure_order %}
+                        <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% else %}
+                <span>Staff by category by tenure not available</span>
+                {% endif %}
+            </div>
 
-            {% for category in category_order if category in staff_by_category_by_education %}
-            <tr>
-                <td>{{category}}</td>
-                {% for degree in degree_order %}
-                <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
-                {% endfor %}
-            </tr>
+            <hr />
 
-            {% endfor %}
-        </table>
-        {% else %}
-        <span>Staff by category by education not available</span>
-        {% endif %}
+            <div class="table-section">
 
-        {% if staff_by_category_by_tenure is defined and staff_by_category_by_tenure %}
-        <table>
-            <caption>Staff per Category by Tenure at School (Until 2018-2019)</caption>
-            <tr>
-                <th scope="col">Category</th>
-                {% for tenure in tenure_order %}
-                <th scope="col">{{tenure_map[tenure]}}</th>
-                {% endfor %}
-            </tr>
+                <div class="section-label">
+                    <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
+                </div>
+                {% if discipline_by_type_by_sex is defined and discipline_by_type_by_sex %}
+                <table>
+                    <caption>Discipline Actions by Gender (2015-2016)</caption>
+                    <tr>
+                        <th scope="col">Gender</th>
+                        <th scope="col">In-School Suspension</th>
+                        <th scope="col">Out-of-School Suspension</th>
+                        <th scope="col">Referral to Law Enforcement</th>
+                    </tr>
 
-            {% for category in category_order if category in staff_by_category_by_tenure %}
-            <tr>
-                <td>{{category}}</td>
-                {% for tenure in tenure_order %}
-                <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <span>Staff by category by tenure not available</span>
-        {% endif %}
+                    <tr>
+                        <th scope="row">Female</th>
+                        <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
+                        <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
+                        <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Male</th>
+                        <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
+                        <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
+                        <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
+                    </tr>
+                </table>
+                {% else %}
+                <span>Discipline by type by sex not available</span>
+                {% endif %}
 
-        {% if discipline_by_type_by_sex is defined and discipline_by_type_by_sex %}
-        <table>
-            <caption>Discipline Actions by Gender (2015-2016)</caption>
-            <tr>
-                <th scope="col">Gender</th>
-                <th scope="col">In-School Suspension</th>
-                <th scope="col">Out-of-School Suspension</th>
-                <th scope="col">Referral to Law Enforcement</th>
-            </tr>
+                {% if discipline_by_type_by_race is defined and discipline_by_type_by_race %}
+                <table>
+                    <caption>Discipline Actions by Race (2015-2016)</caption>
+                    <tr>
+                        <th scope="col">Type of Action</th>
+                        <th scope="col">American Indian or Alaska Native</th>
+                        <th scope="col">Asian</th>
+                        <th scope="col">Hawaiian or Pacific Islander</th>
+                        <th scope="col">Hispanic</th>
+                        <th scope="col">Black</th>
+                        <th scope="col">White</th>
+                        <th scope="col">Two or More Races</th>
+                        <th scope="col">Total</th>
+                    </tr>
 
-            <tr>
-                <th scope="row">Female</th>
-                <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
-                <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
-                <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
-            </tr>
-            <tr>
-                <th scope="row">Male</th>
-                <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
-                <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
-                <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
-            </tr>
-        </table>
-        {% else %}
-        <span>Discipline by type by sex not available</span>
-        {% endif %}
-
-        {% if discipline_by_type_by_race is defined and discipline_by_type_by_race %}
-        <table>
-            <caption>Discipline Actions by Race (2015-2016)</caption>
-            <tr>
-                <th scope="col">Type of Action</th>
-                <th scope="col">American Indian or Alaska Native</th>
-                <th scope="col">Asian</th>
-                <th scope="col">Hawaiian or Pacific Islander</th>
-                <th scope="col">Hispanic</th>
-                <th scope="col">Black</th>
-                <th scope="col">White</th>
-                <th scope="col">Two or More Races</th>
-                <th scope="col">Total</th>
-            </tr>
-
-            <tr>
-                <th scope="row">In-School Suspension</th>
-                {% for race in race_order %}
-                <td>{{discipline_by_type_by_race['iss'][race]}}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <th scope="row">Out-of-School Suspension</th>
-                {% for race in race_order %}
-                <td>{{discipline_by_type_by_race['oss'][race]}}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <th scope="row">Referral to Law Enforcement</th>
-                {% for race in race_order %}
-                <td>{{discipline_by_type_by_race['referral'][race]}}</td>
-                {% endfor %}
-            </tr>
-        </table>
-        {% else %}
-        <span>Discipline by type by race not available</span>
-        {% endif %}
+                    <tr>
+                        <th scope="row">In-School Suspension</th>
+                        {% for race in race_order %}
+                        <td>{{discipline_by_type_by_race['iss'][race]}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Out-of-School Suspension</th>
+                        {% for race in race_order %}
+                        <td>{{discipline_by_type_by_race['oss'][race]}}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th scope="row">Referral to Law Enforcement</th>
+                        {% for race in race_order %}
+                        <td>{{discipline_by_type_by_race['referral'][race]}}</td>
+                        {% endfor %}
+                    </tr>
+                </table>
+                {% else %}
+                <span>Discipline by type by race not available</span>
+                {% endif %}
+            </div>
 
         </div>
 
