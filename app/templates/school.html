@@ -320,6 +320,11 @@ a.header-block:hover {
     border-bottom: none;
 }
 
+#summary-info-data {
+    outline: 2px solid black;
+    display: inline-block;
+    padding: 4px;
+}
 
 </style>
     <head>
@@ -364,21 +369,22 @@ a.header-block:hover {
 
             <div id="summary-info">
                 <span class="underline bold">Summary Data (as of 2018-2019 School Year)</span> <br />
+                <div id="summary-info-data">
                 {% if school.is_private %}
-                <span class="bold">Affiliation: Private, </span><span>{{private_affiliation}}</span> <br />
-                {% else %}
-                <span class="bold">Affiliation:&nbsp;</span><span>Public, {{public_affiliation}}</span> <br />
-                {% endif %}
+                    <span class="bold">Affiliation: Private, </span><span>{{private_affiliation}}</span> <br />
+                    {% else %}
+                    <span class="bold">Affiliation:&nbsp;</span><span>Public, {{public_affiliation}}</span> <br />
+                    {% endif %}
 
-                <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
-                <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
-                {% if school.disadvantaged_pct %}
-                <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
-                {% endif %}
-                <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
-                {% if school.choice_students_pct %}
-                <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
-                {% endif %}
+                    <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
+                    <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
+                    {% if school.disadvantaged_pct %}
+                    <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
+                    {% endif %}
+                    <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
+                    {% if school.choice_students_pct %}
+                    <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
+                    {% endif %}
 
                 {% if pss_info is defined and pss_info %}
                 <table>
@@ -425,6 +431,7 @@ a.header-block:hover {
                 {% elif school.is_private %}
                 <span>Private School Data not available</span>
                 {% endif %}
+                </div>
             </div>
 
 
