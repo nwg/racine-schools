@@ -214,16 +214,12 @@ div.data-table span.source {
     color: #888888;
 }
 
-div.section-table-list div.data-table {
+div.section-table-list > * {
     margin-top: 2em;
 }
 
-div.section-table-list div.data-table:first-child {
+div.section-table-list > *:first-child {
     margin-top: 0;
-}
-
-table.missing-data {
-    margin-bottom: 2em;
 }
 
 #ric-footer {
@@ -445,25 +441,25 @@ a.header-block:hover {
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
                 </div>
 
-                {% if missing.student %}
-                <table class="missing-data">
-                    <caption>Ø Missing Student Data</caption>
-                    <tr>
-                        <th scope="col">Table</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Year</th>
-                    </tr>
-                    {% for id, data in missing.student.items() %}
-                    <tr>
-                        <td>{{id_longname_map[id]}}</td>
-                        <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                        <td>{{data.year}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-
                 <div class="section-table-list">
+                    {% if missing.student %}
+                    <table class="missing-data">
+                        <caption>Ø Missing Student Data</caption>
+                        <tr>
+                            <th scope="col">Table</th>
+                            <th scope="col">Source</th>
+                            <th scope="col">Year</th>
+                        </tr>
+                        {% for id, data in missing.student.items() %}
+                        <tr>
+                            <td>{{id_longname_map[id]}}</td>
+                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                            <td>{{data.year}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
                     {% if tables.student.pss_enrollment_by_grade %}
                     {% set pss_enollment_by_grade = tables.student.pss_enrollment_by_grade %}
                     {% set year = tables.student.pss_enrollment_by_grade.year %}
@@ -639,25 +635,25 @@ a.header-block:hover {
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
                 </div>
 
-                {% if missing.staff %}
-                <table class="missing-data">
-                    <caption>Ø Missing Staff Data</caption>
-                    <tr>
-                        <th scope="col">Table</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Year</th>
-                    </tr>
-                    {% for id, data in missing.staff.items() %}
-                    <tr>
-                        <td>{{id_longname_map[id]}}</td>
-                        <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                        <td>{{data.year}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-
                 <div class="section-table-list">
+                    {% if missing.staff %}
+                    <table class="missing-data">
+                        <caption>Ø Missing Staff Data</caption>
+                        <tr>
+                            <th scope="col">Table</th>
+                            <th scope="col">Source</th>
+                            <th scope="col">Year</th>
+                        </tr>
+                        {% for id, data in missing.staff.items() %}
+                        <tr>
+                            <td>{{id_longname_map[id]}}</td>
+                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                            <td>{{data.year}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
                     {% if tables.staff.staff_by_sex_by_category %}
                     {% set staff_by_sex_by_category = tables.staff.staff_by_sex_by_category.table %}
                     {% set year = tables.staff.staff_by_sex_by_category.year %}
@@ -760,25 +756,25 @@ a.header-block:hover {
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
                 </div>
 
-                {% if missing.discipline %}
-                <table class="missing-data">
-                    <caption>Ø Missing Discipline Data</caption>
-                    <tr>
-                        <th scope="col">Table</th>
-                        <th scope="col">Source</th>
-                        <th scope="col">Year</th>
-                    </tr>
-                    {% for id, data in missing.discipline.items() %}
-                    <tr>
-                        <td>{{id_longname_map[id]}}</td>
-                        <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                        <td>{{data.year}}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-                {% endif %}
-
                 <div class="section-table-list">
+                    {% if missing.discipline %}
+                    <table class="missing-data">
+                        <caption>Ø Missing Discipline Data</caption>
+                        <tr>
+                            <th scope="col">Table</th>
+                            <th scope="col">Source</th>
+                            <th scope="col">Year</th>
+                        </tr>
+                        {% for id, data in missing.discipline.items() %}
+                        <tr>
+                            <td>{{id_longname_map[id]}}</td>
+                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                            <td>{{data.year}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
                     {% if tables.discipline.discipline_by_type_by_sex %}
                     {% set discipline_by_type_by_sex = tables.discipline.discipline_by_type_by_sex.table %}
                     {% set year = tables.discipline.discipline_by_type_by_sex.year %}
