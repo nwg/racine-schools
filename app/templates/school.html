@@ -177,8 +177,19 @@ a.standard-link {
 div.section-label {
     width: 45%;
     height: 6rem;
-    background-color: #c90500;
     color: #ffffff;
+}
+
+div.section-label#student-demo-label {
+    background-color: #c90500;
+}
+
+div.section-label#staff-demo-label {
+    background-color: #000dfc;
+}
+
+div.section-label#discipline-label {
+    background-color: #007c1b;
 }
 
 div.section-label span {
@@ -205,6 +216,18 @@ div.section-label {
     margin-bottom: 2rem;
 }
 
+#student-demo-tables {
+    outline-color: #c90500;
+}
+
+#staff-demo-tables {
+    outline-color: #000dfc;
+}
+
+#discipline-tables {
+    outline-color: #007c1b;
+}
+
 div.table-section {
     margin-bottom: 4rem;
 }
@@ -214,6 +237,10 @@ div.data-table span.source {
     color: #888888;
 }
 
+div.section-table-list {
+    outline: 2px solid black;
+    padding: 10px;
+}
 div.section-table-list > * {
     margin-top: 2em;
 }
@@ -437,11 +464,11 @@ a.header-block:hover {
 
         <div id="schools-tables">
             <div class="table-section">
-                <div class="section-label">
+                <div id="student-demo-label" class="section-label">
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
                 </div>
 
-                <div class="section-table-list">
+                <div id="student-demo-tables" class="section-table-list">
                     {% if missing.student %}
                     <table class="missing-data">
                         <caption>Ø Missing Student Data</caption>
@@ -631,11 +658,11 @@ a.header-block:hover {
 
             <div class="table-section">
 
-                <div class="section-label">
+                <div id="staff-demo-label" class="section-label">
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
                 </div>
 
-                <div class="section-table-list">
+                <div id="staff-demo-tables" class="section-table-list">
                     {% if missing.staff %}
                     <table class="missing-data">
                         <caption>Ø Missing Staff Data</caption>
@@ -752,11 +779,11 @@ a.header-block:hover {
 
             <div class="table-section">
 
-                <div class="section-label">
+                <div id="discipline-label" class="section-label">
                     <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
                 </div>
 
-                <div class="section-table-list">
+                <div id="discipline-tables" class="section-table-list">
                     {% if missing.discipline %}
                     <table class="missing-data">
                         <caption>Ø Missing Discipline Data</caption>
