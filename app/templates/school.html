@@ -192,8 +192,12 @@ a.standard-link {
 
 div.section-label {
     min-width: max-content;
-    height: 6rem;
+    height: 3rem;
+    line-height: 3rem;
     color: #ffffff;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
+    padding-right: 3rem;
 }
 
 div.section-label#student-demo-label {
@@ -210,27 +214,20 @@ div.section-label#discipline-label {
 
 div.section-label span {
     display: inline-block;
-    line-height: 6rem;
     vertical-align: middle;
+    line-height: normal;
 }
 
 div.section-label span.section-label-icon {
     margin-left: 2.5rem;
-    font-size: 5rem;
-    line-height: 5rem;
-    margin-bottom: 1rem;
+    font-size: 2.25rem;
+    padding-bottom: 0.25rem;
 }
 
 div.section-label span.section-label-title {
     margin-left: 1.5rem;
-    font-size: 2.25rem;
+    font-size: 1.25rem;
     font-weight: bold;
-}
-
-div.section-label {
-    margin-top: 3rem;
-    margin-bottom: 2rem;
-    padding-right: 3rem;
 }
 
 #student-demo-tables {
@@ -366,6 +363,11 @@ a.header-block:hover {
 #students-by-grade-by-race tr.title-row th {
     width: 6rem;
     min-width: 6rem;
+}
+
+#staff-by-category-by-education-level tr.title-row th {
+    width: 4.5rem;
+    min-width: 4.5rem;
 }
 
 </style>
@@ -720,9 +722,9 @@ a.header-block:hover {
                     {% set source = tables.staff.staff_by_category_by_education.source %}
                     {% set url = tables.staff.staff_by_category_by_education.url %}
                     <div class="data-table">
-                        <table>
+                        <table id="staff-by-category-by-education-level">
                             <caption>Staff by Category by Education Level (2018-2019)</caption>
-                            <tr>
+                            <tr class="title-row">
                                 <th scope="col">Category</th>
                                 {% for degree in degree_order %}
                                 <th scope="col">{{degree_map[degree]}}</th>
