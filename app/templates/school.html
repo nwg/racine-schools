@@ -21,6 +21,12 @@
     ('total', 'Total')
 ]) %}
 
+{% set source_map = dict([
+    ('nces', "National Center for Education Statistics"),
+    ('dpi', "Wisconsin Department of Public Instruction"),
+    ('ocr', "Office of Civil Rights, US Dept. of Education"),
+]) %}
+
 {% set degree_order = ('associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other') %}
 {% set tenure_pairs = [
     ('1_2', "1-2 Years"),
@@ -527,7 +533,7 @@ a.header-block:hover {
                                 {% endif %}
                             </tr>
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
 
                     {% endif %}
@@ -552,7 +558,7 @@ a.header-block:hover {
                                 {% endfor %}
                             </tr>
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
 
@@ -576,7 +582,7 @@ a.header-block:hover {
                                 <td>{{pss_enrollment_by_demographic.total}}</td>
                             </tr>
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
 
@@ -613,7 +619,7 @@ a.header-block:hover {
                                 <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
                             </tr>
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% else %}
                     <span>Enrollment by grade by sex not available</span>
@@ -649,7 +655,7 @@ a.header-block:hover {
                             {% endfor %}
 
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% else %}
                     <span>Enrollment by grade by race not available</span>
@@ -704,7 +710,7 @@ a.header-block:hover {
                                 <td>{{staff_by_sex_by_category['M'][category]}}</td>
                             {% endfor %}
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
 
@@ -733,7 +739,7 @@ a.header-block:hover {
 
                             {% endfor %}
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
 
@@ -761,7 +767,7 @@ a.header-block:hover {
                             </tr>
                             {% endfor %}
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% else %}
                     <span>Staff by category by tenure not available</span>
@@ -822,7 +828,7 @@ a.header-block:hover {
                                 <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
                             </tr>
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
 
@@ -850,7 +856,7 @@ a.header-block:hover {
                             </tr>
                             {% endfor %}
                         </table>
-                        <span class="source">Source: {{source}}, {{url}}</span>
+                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                     </div>
                     {% endif %}
                 </div>
