@@ -599,14 +599,14 @@ a.header-block:hover {
                             </tr>
 
                             <tr>
-                                <td>F</td>
+                                <th scope="row">F</th>
                                 {% for grade in grades %}
                                 <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
                                 {% endfor %}
                                 <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
                             </tr>
                             <tr>
-                                <td>M</td>
+                                <th scope="row">M</th>
                                 {% for grade in grades %}
                                 <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
                                 {% endfor %}
@@ -700,13 +700,13 @@ a.header-block:hover {
                             </tr>
 
                             <tr>
-                                <td>F</td>
+                                <th scope="row">F</th>
                                 {% for category in cols %}
                                 <td>{{staff_by_sex_by_category['F'][category]}}</td>
                                 {% endfor %}
                             </tr>
                             <tr>
-                                <td>M</td>
+                                <th scope="row">M</th>
                                 {% for category in cols %}
                                 <td>{{staff_by_sex_by_category['M'][category]}}</td>
                                 {% endfor %}
@@ -733,7 +733,7 @@ a.header-block:hover {
 
                             {% for category in category_order if category in staff_by_category_by_education %}
                             <tr>
-                                <td>{{category}}</td>
+                                <th scope="row">{{category}}</th>
                                 {% for degree in degree_order %}
                                 <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
                                 {% endfor %}
@@ -762,7 +762,7 @@ a.header-block:hover {
 
                             {% for category in category_order if category in staff_by_category_by_tenure %}
                             <tr>
-                                <td>{{category}}</td>
+                                <th scope="row">{{category}}</th>
                                 {% for tenure in tenure_order %}
                                 <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
                                 {% endfor %}
