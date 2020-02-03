@@ -125,13 +125,12 @@ body {
 }
 
 #mission-info {
-   padding-top: 20px;
-   font-size: 16pt;
+    padding-top: 20px;
+    font-size: 16pt;
 }
 
-#mission-statement {
+#mission-info span {
     display: inline-block;
-    width: 50%;
 }
 
 #report-card-info {
@@ -383,7 +382,8 @@ a.header-block:hover {
             </div>
 
             <div id="mission-info">
-                <span><span style="font-weight: bold; vertical-align: top;">Mission: </span><span id="mission-statement">{{school.mission}}</span></span>
+                <span style="font-weight: bold;">Mission:</span>
+                <span style="padding-top: 4px;" id="mission-statement">{{school.mission}}</span>
             </div>
 
             <div id="report-card-info">
