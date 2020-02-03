@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% set race_order = ['black', 'white', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races', 'total'] %}
+{% set race_order = ['white', 'black', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races', 'total'] %}
 {% set grade_order = ['PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
@@ -629,22 +629,21 @@ a.header-block:hover {
                             <caption>Students by Grade by Race ({{year}}-{{year+1}})</caption>
                             <tr class="title-row">
                                 <th scope="col">Grade</th>
-                                {% for race in race_order %}
-                                <th scope="col">{{race_map[race]}}</th>
+                                {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                                <th scope="col">{{grade}}</th>
                                 {% endfor %}
                             </tr>
 
-                            {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                            {% for race in race_order %}
                             <tr>
-                                <th scope="row">{{grade}}</th>
-                                {% for race in race_order %}
+                                <th scope="row">{{race_map[race]}}</th>
+                                {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
                                 {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
                                 {% if race != 'total' %}
                                 <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
                                 {% else %}
                                 <td>{{count}}</td>
                                 {% endif %}
-
                                 {% endfor %}
                             </tr>
                             {% endfor %}
@@ -693,24 +692,17 @@ a.header-block:hover {
                         <table>
                             <caption>Staff by Gender by Category ({{year}}-{{year+1}})</caption>
                             <tr>
-                                <th scope="col">Gender</th>
-                                {% for category in cols %}
-                                <th scope="col">{{category}}</th>
-                                {% endfor %}
+                                <th scope="col">Category</th>
+                                <th scope="col">F</th>
+                                <th scope="col">M</th>
                             </tr>
 
+                            {% for category in cols %}
                             <tr>
-                                <th scope="row">F</th>
-                                {% for category in cols %}
+                                <th scope="row">{{category}}</th>
                                 <td>{{staff_by_sex_by_category['F'][category]}}</td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th scope="row">M</th>
-                                {% for category in cols %}
                                 <td>{{staff_by_sex_by_category['M'][category]}}</td>
-                                {% endfor %}
-                            </tr>
+                            {% endfor %}
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
@@ -843,35 +835,20 @@ a.header-block:hover {
                         <table>
                             <caption>Discipline Actions by Race ({{year}}-{{year+1}})</caption>
                             <tr>
-                                <th scope="col">Type of Action</th>
-                                <th scope="col">American Indian or Alaska Native</th>
-                                <th scope="col">Asian</th>
-                                <th scope="col">Hawaiian or Pacific Islander</th>
-                                <th scope="col">Hispanic</th>
-                                <th scope="col">Black</th>
-                                <th scope="col">White</th>
-                                <th scope="col">Two or More Races</th>
-                                <th scope="col">Total</th>
+                                <th scope="col">Race</th>
+                                <th scope="col">In-School Suspension</th>
+                                <th scope="col">Out-of-School Suspension</th>
+                                <th scope="col">Referral to Law Enforcement</th>
                             </tr>
 
+                            {% for race in race_order %}
                             <tr>
-                                <th scope="row">In-School Suspension</th>
-                                {% for race in race_order %}
+                                <th scope="row">{{race_map[race]}}</th>
                                 <td>{{discipline_by_type_by_race['iss'][race]}}</td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th scope="row">Out-of-School Suspension</th>
-                                {% for race in race_order %}
                                 <td>{{discipline_by_type_by_race['oss'][race]}}</td>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th scope="row">Referral to Law Enforcement</th>
-                                {% for race in race_order %}
                                 <td>{{discipline_by_type_by_race['referral'][race]}}</td>
-                                {% endfor %}
                             </tr>
+                            {% endfor %}
                         </table>
                         <span class="source">Source: {{source}}, {{url}}</span>
                     </div>
