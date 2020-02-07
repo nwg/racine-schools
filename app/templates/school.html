@@ -25,6 +25,7 @@
     ('nces', "National Center for Education Statistics"),
     ('dpi', "Wisconsin Department of Public Instruction"),
     ('ocr', "Office of Civil Rights, US Dept. of Education"),
+    ('pss', "NCES Private School Universe Survey"),
 ]) %}
 
 {% set degree_order = ('associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other') %}
@@ -509,7 +510,7 @@ a.header-block:hover {
                             {% for id, data in missing.student.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
@@ -630,8 +631,6 @@ a.header-block:hover {
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
-                        {% else %}
-                        <span>Enrollment by grade by sex not available</span>
                         {% endif %}
 
                         {% if tables.student.enrollment_by_grade_by_race %}
@@ -666,8 +665,6 @@ a.header-block:hover {
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
-                        {% else %}
-                        <span>Enrollment by grade by race not available</span>
                         {% endif %}
                     </div>
                 </div>
@@ -690,7 +687,7 @@ a.header-block:hover {
                             {% for id, data in missing.staff.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
@@ -802,7 +799,7 @@ a.header-block:hover {
                             {% for id, data in missing.discipline.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
