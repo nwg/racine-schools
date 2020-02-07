@@ -13,8 +13,10 @@ def get_bool(s):
     except ValueError:
         return False
 
-def get_possibly_not_available(s):
+def get_maybe(s):
     if s.lower() == 'not available':
+        return None
+    if s.strip() == '':
         return None
     return s
 
@@ -50,7 +52,7 @@ def schools():
                 continue
 
             d = {}
-            d['longname'] = row['name']
+            d['longname'] = row['name'].strip()
             d['is_elementary'] = get_bool(row['E'])
             d['is_middle'] = get_bool(row['M'])
             d['is_high'] = get_bool(row['H'])
@@ -67,13 +69,13 @@ def schools():
             d['phone'] = row['Phone'] or None
             d['website'] = row['Website'] or None
             d['mission'] = row['Mission'] or None
-            d['report1'] = report_url(row['Report1']) or None
-            d['report2'] = report_url(row['Report2']) or None
+            d['report1'] = report_url(get_maybe(row['Report1'])) or None
+            d['report2'] = report_url(get_maybe(row['Report2'])) or None
             d['logo'] = logo_url(row['Logo'])
-            d['disadvantaged_pct'] = strip_star(get_possibly_not_available(row['Economically Disadvantaged'])) or None
+            d['disadvantaged_pct'] = strip_star(get_maybe(row['Economically Disadvantaged'])) or None
             d['curriculum_focus'] = row['Curriculum Focus'] or None
-            d['num_students'] = strip_star(get_possibly_not_available(row['Num Students'])) or None
-            d['choice_students_pct'] = strip_star(strip_star(get_possibly_not_available(row['Percent Choice Students']))) or None
+            d['num_students'] = strip_star(get_maybe(row['Num Students'])) or None
+            d['choice_students_pct'] = strip_star(strip_star(get_maybe(row['Percent Choice Students']))) or None
 
             yield d
 
