@@ -13,12 +13,34 @@ def get_bool(s):
     except ValueError:
         return False
 
+def get_possibly_not_available(s):
+    if s.lower() == 'not available':
+        return None
+    return s
+
+def strip_star(s):
+    if s == None:
+        return s
+    return s.rstrip('*')
+
 def format_grade(s):
     try:
         intgrade = int(s)
     except ValueError:
         return s
     return f'{intgrade:02}'
+
+from urllib.parse import urljoin
+LOGO_BASE = 'https://racineschools.s3.amazonaws.com/logos-scaled/'
+
+def logo_url(s):
+    if s == None: return None
+    return urljoin(LOGO_BASE, s)
+
+REPORT_BASE = 'https://racineschools.s3.amazonaws.com/report-cards/'
+def report_url(s):
+    if s == None: return None
+    return urljoin(REPORT_BASE, s)
 
 def schools():
     with open('data/racine-schools-directory.csv', newline='') as csvfile:
@@ -45,13 +67,13 @@ def schools():
             d['phone'] = row['Phone'] or None
             d['website'] = row['Website'] or None
             d['mission'] = row['Mission'] or None
-            d['report1'] = row['Report1'] or None
-            d['report2'] = row['Report2'] or None
-            d['logo'] = row['Logo']
-            d['disadvantaged_pct'] = row['Economically Disadvantaged'] or None
+            d['report1'] = report_url(row['Report1']) or None
+            d['report2'] = report_url(row['Report2']) or None
+            d['logo'] = logo_url(row['Logo'])
+            d['disadvantaged_pct'] = strip_star(get_possibly_not_available(row['Economically Disadvantaged'])) or None
             d['curriculum_focus'] = row['Curriculum Focus'] or None
-            d['num_students'] = row['Num Students'] or None
-            d['choice_students_pct'] = row['Percent Choice Students'] or None
+            d['num_students'] = strip_star(get_possibly_not_available(row['Num Students'])) or None
+            d['choice_students_pct'] = strip_star(strip_star(get_possibly_not_available(row['Percent Choice Students']))) or None
 
             yield d
 
