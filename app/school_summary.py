@@ -41,6 +41,15 @@ STAFF_CATEGORIES = (
 
 GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
 
+def pssdict(**extra):
+    d = {
+        'source': 'pss',
+        'url': PSS_SURVEY_WEBSITE,
+        'year': MOST_RECENT_PSS_YEAR
+    }
+    d.update(extra)
+    return d
+
 def render_school_summary_with_name(name):
     school = db.school_with_name(name)
     school = dict(school)
@@ -54,6 +63,11 @@ def render_school_summary_with_name(name):
 
     tables = {}
     missing = {}
+
+    if ppin != None:
+        tables['summary'] = { 'pss_info': pssdict(table=get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin)) }
+    else:
+        missing['summary'] = { 'pss_info': pssdict() }
 
     t, m = student_tables(school['is_private'], nces_id, ppin)
     tables['student'] = t
@@ -114,15 +128,6 @@ def discipline_tables(nces_id):
 def student_tables(is_private, nces_id, ppin):
     tables = {}
     missing = {}
-
-    def pssdict(**extra):
-        d = {
-            'source': 'pss',
-            'url': PSS_SURVEY_WEBSITE,
-            'year': MOST_RECENT_PSS_YEAR
-        }
-        d.update(extra)
-        return d
 
     if ppin:
         tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin))
@@ -195,7 +200,7 @@ def staff_tables(state_lea_id, state_school_id):
 
     return tables, missing
 
-def get_pss_info(cur, ppin):
+def get_pss_info(cur, year, ppin):
     def query_pss_info():
         joins = [
             (
@@ -207,7 +212,7 @@ def get_pss_info(cur, ppin):
                         ['pss_religious_orientation', 'category']))
             ),
         ]
-        return select('pss_info', '*', where=idequals('ppin', ppin), join=joins)
+        return select('pss_info', '*', where=andd([idequals('ppin', ppin), idequals('year', year)]), join=joins)
     q = query_pss_info()
     cur.execute(q)
 

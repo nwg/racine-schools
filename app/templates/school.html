@@ -440,9 +440,11 @@ a.header-block:hover {
                         <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
                         {% endif %}
 
-                    {% if pss_info is defined and pss_info %}
+                    {% if tables.summary.pss_info %}
+                    {% set pss_info = tables.summary.pss_info.table %}
+                    {% set year = tables.summary.pss_info.year %}
                     <table>
-                        <caption>Private School Data</caption>
+                        <caption>Private School Data ({{year}}-{{year+1}})</caption>
                         <tr>
                             <th scope="row">Kindergarten Hours</td>
                             <td>{{pss_info.kg_hours}}</td>
