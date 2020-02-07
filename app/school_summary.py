@@ -64,10 +64,12 @@ def render_school_summary_with_name(name):
     tables = {}
     missing = {}
 
+    tables['summary'] = {}
+    missing['summary'] = {}
     if ppin != None:
-        tables['summary'] = { 'pss_info': pssdict(table=get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin)) }
+        tables['summary']['pss_info'] = pssdict(table=get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin))
     else:
-        missing['summary'] = { 'pss_info': pssdict() }
+        missing['summary']['pss_info'] = pssdict()
 
     t, m = student_tables(school['is_private'], nces_id, ppin)
     tables['student'] = t
