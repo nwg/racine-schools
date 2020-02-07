@@ -122,13 +122,15 @@ div.small-summary span {
     display: inline-block;
 }
 
-body {
-    margin-left: 72px;
-    margin-right: 72px;
-    margin-top: 0;
+#content {
+    display: inline-block;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    width: max-content;
 }
 
 #summary {
+    width: 90vw;
     margin-left: 0px;
 }
 
@@ -338,6 +340,7 @@ a.header-block:hover {
 }
 
 #header {
+    width: 90vw;
     height: 4rem;
 }
 
@@ -378,503 +381,505 @@ a.header-block:hover {
         <title>{{school['longname']}}</title>
     </head>
     <body>
-        <div id="header">
-            <div style="margin-left: 19.66%; margin-top: 8px; display: inline-block;">
-                <a class="header-block nostyle" href="http://racineschools.com/about/"><span class="header-link">About</a></span></a>
-                <a class="header-block nostyle" href="http://racineschools.com/contact/"><span class="header-link">Contact</span></a>
-                <a class="header-block nostyle" href="http://racineschools.com/donate/"><span class="header-link">Donate</span></a>
-            </div>
-            <div id="apple-logo">
-                <a id="home-anchor" href="http://racineschools.com"><img width="165" height="105" id="home-image" src="https://racineschools.s3.amazonaws.com/static/racine-schools-logo.jpg" /></a>
-            </div>
-        </div>
-        <img src="{{school.logo}}" />
-
-        <div id="summary">
-
-            <div style="padding-bottom: 0px; padding-top: 32px;">
-                <span style="font-size: 21.333pt;">{{school.longname}}</span>
-                <div class="small-summary" style="margin-top: 1em;">
-                    <span>{{school.address1}}</span><br />
-                    <span>{{school.address2}}</span><br />
-                    <span>{{school.phone}}</span><br />
+        <div id="content">
+            <div id="header">
+                <div style="margin-left: 19.66%; margin-top: 8px; display: inline-block;">
+                    <a class="header-block nostyle" href="http://racineschools.com/about/"><span class="header-link">About</a></span></a>
+                    <a class="header-block nostyle" href="http://racineschools.com/contact/"><span class="header-link">Contact</span></a>
+                    <a class="header-block nostyle" href="http://racineschools.com/donate/"><span class="header-link">Donate</span></a>
+                </div>
+                <div id="apple-logo">
+                    <a id="home-anchor" href="http://racineschools.com"><img width="165" height="105" id="home-image" src="https://racineschools.s3.amazonaws.com/static/racine-schools-logo.jpg" /></a>
                 </div>
             </div>
+            <img src="{{school.logo}}" />
 
-            <div id="website-info">
-                <span style="font-weight: bold;">Website</span> <br />
-                <span style="padding-top: 4px;"><a class="standard-link" href="{{school.website}}">{{school.website}}</a></span> <br />
-            </div>
+            <div id="summary">
 
-            <div id="mission-info">
-                <span style="font-weight: bold;">Mission:</span>
-                <span style="padding-top: 4px;" id="mission-statement">{{school.mission}}</span>
-            </div>
-
-            <div id="report-card-info">
-                <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">State Report Card</a></span>
-            </div>
-
-            <div id="summary-info">
-                <span class="underline bold">Summary Data (as of 2018-2019 School Year)</span> <br />
-                <div id="summary-info-data">
-                {% if school.is_private %}
-                    <span class="bold">Affiliation: Private, </span><span>{{private_affiliation}}</span> <br />
-                    {% else %}
-                    <span class="bold">Affiliation:&nbsp;</span><span>Public, {{public_affiliation}}</span> <br />
-                    {% endif %}
-
-                    <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
-                    <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
-                    {% if school.disadvantaged_pct %}
-                    <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
-                    {% endif %}
-                    <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
-                    {% if school.choice_students_pct %}
-                    <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
-                    {% endif %}
-
-                {% if pss_info is defined and pss_info %}
-                <table>
-                    <caption>Private School Data</caption>
-                    <tr>
-                        <th scope="row">Kindergarten Hours</td>
-                        <td>{{pss_info.kg_hours}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Kindergarten Days Per Week</td>
-                        <td>{{pss_info.kg_days_per_week}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Is Religious</td>
-                        <td>{% if pss_info.is_religious %}Yes{% else %}No{% endif %}</td>
-                    </tr>
-                    {% if pss_info.is_religious %}
-                    <tr>
-                        <th scope="row">Orientation</th>
-                        <td>{{pss_info.label}}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th scope="row">Days in School Year</th>
-                        <td>{{pss_info.days_in_year}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Time in School Day</th>
-                        <td>{{"%02d"|format(pss_info.hours_in_day)}}:{{"%02d"|format(pss_info.minutes_in_day)}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Num Students</th>
-                        <td>{{pss_info.enrollment}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Num Full-Time Teachers</th>
-                        <td>{{pss_info.num_fte_teachers}}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">Student-Teacher Ratio</th>
-                        <td>{{"%.02f"|format(pss_info.enrollment/pss_info.num_fte_teachers)}}</td>
-                    </tr>
-                </table>
-                {% elif school.is_private %}
-                <span>Private School Data not available</span>
-                {% endif %}
-                </div>
-                <hr style="margin-top: 3em;" />
-            </div>
-
-
-        </div>
-
-        <div id="schools-tables">
-
-            <div class="table-section">
-                <div id="student-demo-label" class="section-label">
-                    <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
+                <div style="padding-bottom: 0px; padding-top: 32px;">
+                    <span style="font-size: 21.333pt;">{{school.longname}}</span>
+                    <div class="small-summary" style="margin-top: 1em;">
+                        <span>{{school.address1}}</span><br />
+                        <span>{{school.address2}}</span><br />
+                        <span>{{school.phone}}</span><br />
+                    </div>
                 </div>
 
-                <div id="student-demo-tables" class="section-table-list">
-                    {% if missing.student %}
-                    <table class="missing-data">
-                        <caption>Ø Missing Student Data</caption>
+                <div id="website-info">
+                    <span style="font-weight: bold;">Website</span> <br />
+                    <span style="padding-top: 4px;"><a class="standard-link" href="{{school.website}}">{{school.website}}</a></span> <br />
+                </div>
+
+                <div id="mission-info">
+                    <span style="font-weight: bold;">Mission:</span>
+                    <span style="padding-top: 4px;" id="mission-statement">{{school.mission}}</span>
+                </div>
+
+                <div id="report-card-info">
+                    <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">State Report Card</a></span>
+                </div>
+
+                <div id="summary-info">
+                    <span class="underline bold">Summary Data (as of 2018-2019 School Year)</span> <br />
+                    <div id="summary-info-data">
+                    {% if school.is_private %}
+                        <span class="bold">Affiliation: Private, </span><span>{{private_affiliation}}</span> <br />
+                        {% else %}
+                        <span class="bold">Affiliation:&nbsp;</span><span>Public, {{public_affiliation}}</span> <br />
+                        {% endif %}
+
+                        <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
+                        <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
+                        {% if school.disadvantaged_pct %}
+                        <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
+                        {% endif %}
+                        <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
+                        {% if school.choice_students_pct %}
+                        <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
+                        {% endif %}
+
+                    {% if pss_info is defined and pss_info %}
+                    <table>
+                        <caption>Private School Data</caption>
                         <tr>
-                            <th scope="col">Table</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Year</th>
+                            <th scope="row">Kindergarten Hours</td>
+                            <td>{{pss_info.kg_hours}}</td>
                         </tr>
-                        {% for id, data in missing.student.items() %}
                         <tr>
-                            <td>{{id_longname_map[id]}}</td>
-                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                            <td>{{data.year}}</td>
+                            <th scope="row">Kindergarten Days Per Week</td>
+                            <td>{{pss_info.kg_days_per_week}}</td>
                         </tr>
-                        {% endfor %}
+                        <tr>
+                            <th scope="row">Is Religious</td>
+                            <td>{% if pss_info.is_religious %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        {% if pss_info.is_religious %}
+                        <tr>
+                            <th scope="row">Orientation</th>
+                            <td>{{pss_info.label}}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th scope="row">Days in School Year</th>
+                            <td>{{pss_info.days_in_year}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Time in School Day</th>
+                            <td>{{"%02d"|format(pss_info.hours_in_day)}}:{{"%02d"|format(pss_info.minutes_in_day)}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Num Students</th>
+                            <td>{{pss_info.enrollment}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Num Full-Time Teachers</th>
+                            <td>{{pss_info.num_fte_teachers}}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Student-Teacher Ratio</th>
+                            <td>{{"%.02f"|format(pss_info.enrollment/pss_info.num_fte_teachers)}}</td>
+                        </tr>
                     </table>
+                    {% elif school.is_private %}
+                    <span>Private School Data not available</span>
                     {% endif %}
+                    </div>
+                    <hr style="margin-top: 3em;" />
+                </div>
 
-                    {% if tables.student.pss_enrollment_by_grade %}
-                    {% set pss_enollment_by_grade = tables.student.pss_enrollment_by_grade %}
-                    {% set year = tables.student.pss_enrollment_by_grade.year %}
-                    {% set source = tables.student.pss_enrollment_by_grade.source %}
-                    {% set url = tables.student.pss_enrollment_by_grade.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Private School Enrollment by Grade</caption>
-                            <tr>
-                                <th scope="row">Grade</th>
-                                {% for grade in grade_order if grade in pss_enrollment_by_grade %}
-                                <th scope="col">{{grade}}</th>
-                                {% endfor %}
-                                {% if pss_info is defined and pss_info %}
-                                <th scope="col">Total</th>
-                                {% endif %}
-                            </tr>
-                                <th scope="row">Enrollment</th>
-                                {% for grade in grade_order if grade in pss_enrollment_by_grade %}
-                                <td>{{pss_enrollment_by_grade[grade]}}</td>
-                                {% endfor %}
-                                {% if pss_info is defined and pss_info %}
-                                <td>{{pss_info.enrollment}}</td>
-                                {% endif %}
-                            </tr>
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+
+            </div>
+
+            <div id="schools-tables">
+
+                <div class="table-section">
+                    <div id="student-demo-label" class="section-label">
+                        <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STUDENT DEMOGRAPHICS</span>
                     </div>
 
-                    {% endif %}
-
-                    {% if tables.student.pss_enrollment_by_demographic %}
-                    {% set pss_enrollment_by_demographic = tables.student.pss_enrollment_by_demographic.table %}
-                    {% set year = tables.student.pss_enrollment_by_demographic.year %}
-                    {% set source = tables.student.pss_enrollment_by_demographic.source %}
-                    {% set url = tables.student.pss_enrollment_by_demographic.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Private School Enrollment by Race (KG and Up {{year}}-{{year+1}})</caption>
+                    <div id="student-demo-tables" class="section-table-list">
+                        {% if missing.student %}
+                        <table class="missing-data">
+                            <caption>Ø Missing Student Data</caption>
                             <tr>
-                                <th scope="row">Race</th>
+                                <th scope="col">Table</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Year</th>
+                            </tr>
+                            {% for id, data in missing.student.items() %}
+                            <tr>
+                                <td>{{id_longname_map[id]}}</td>
+                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td>{{data.year}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+
+                        {% if tables.student.pss_enrollment_by_grade %}
+                        {% set pss_enollment_by_grade = tables.student.pss_enrollment_by_grade %}
+                        {% set year = tables.student.pss_enrollment_by_grade.year %}
+                        {% set source = tables.student.pss_enrollment_by_grade.source %}
+                        {% set url = tables.student.pss_enrollment_by_grade.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Private School Enrollment by Grade</caption>
+                                <tr>
+                                    <th scope="row">Grade</th>
+                                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                                    <th scope="col">{{grade}}</th>
+                                    {% endfor %}
+                                    {% if pss_info is defined and pss_info %}
+                                    <th scope="col">Total</th>
+                                    {% endif %}
+                                </tr>
+                                    <th scope="row">Enrollment</th>
+                                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                                    <td>{{pss_enrollment_by_grade[grade]}}</td>
+                                    {% endfor %}
+                                    {% if pss_info is defined and pss_info %}
+                                    <td>{{pss_info.enrollment}}</td>
+                                    {% endif %}
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+
+                        {% endif %}
+
+                        {% if tables.student.pss_enrollment_by_demographic %}
+                        {% set pss_enrollment_by_demographic = tables.student.pss_enrollment_by_demographic.table %}
+                        {% set year = tables.student.pss_enrollment_by_demographic.year %}
+                        {% set source = tables.student.pss_enrollment_by_demographic.source %}
+                        {% set url = tables.student.pss_enrollment_by_demographic.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Private School Enrollment by Race (KG and Up {{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="row">Race</th>
+                                    {% for race in race_order %}
+                                    <th scope="col">race_map[race]</th>
+                                    {% endfor %}
+                                </tr>
+                                    <th scope="row">Enrollment</th>
+                                    {% for race in race_order %}
+                                    <td>{{pss_enrollment_by_demographic[race]}}</td>
+                                    {% endfor %}
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
+
+                        {% if tables.student.pss_enrollment_by_demographic %}
+                        {% set pss_enrollment_by_demographic = tables.student.pss_enrollment_by_demographic.table %}
+                        {% set year = tables.student.pss_enrollment_by_demographic.year %}
+                        {% set source = tables.student.pss_enrollment_by_demographic.source %}
+                        {% set url = tables.student.pss_enrollment_by_demographic.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Private School Enrollment by Gender (KG and Up, {{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="row">Gender</th>
+                                    <th scope="col">Male</th>
+                                    <th scope="col">Female</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+                                    <th scope="row">Enrollment</th>
+                                    <td>{{pss_enrollment_by_demographic.male}}</td>
+                                    <td>{{pss_enrollment_by_demographic.female}}</td>
+                                    <td>{{pss_enrollment_by_demographic.total}}</td>
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
+
+                        {% if tables.student.enrollment_grade_sex_data %}
+                        {% set enrollment_grade_sex_data = tables.student.enrollment_grade_sex_data.table %}
+                        {% set year = tables.student.enrollment_grade_sex_data.year %}
+                        {% set source = tables.student.enrollment_grade_sex_data.source %}
+                        {% set url = tables.student.enrollment_grade_sex_data.url %}
+                        {% set grades = enrollment_grade_sex_data.grades %}
+                        {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Students by Gender by Grade ({{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Gender</th>
+                                    {% for grade in grades %}
+                                    <th scope="col">{{grade}}</th>
+                                    {% endfor %}
+                                    <th scope="col">Total</th>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">F</th>
+                                    {% for grade in grades %}
+                                    <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
+                                    {% endfor %}
+                                    <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">M</th>
+                                    {% for grade in grades %}
+                                    <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
+                                    {% endfor %}
+                                    <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% else %}
+                        <span>Enrollment by grade by sex not available</span>
+                        {% endif %}
+
+                        {% if tables.student.enrollment_by_grade_by_race %}
+                        {% set enrollment_by_grade_by_race = tables.student.enrollment_by_grade_by_race.table %}
+                        {% set year = tables.student.enrollment_by_grade_by_race.year %}
+                        {% set source = tables.student.enrollment_by_grade_by_race.source %}
+                        {% set url = tables.student.enrollment_by_grade_by_race.url %}
+                        <div class="data-table">
+                            <table id="students-by-grade-by-race">
+                                <caption>Students by Grade by Race ({{year}}-{{year+1}})</caption>
+                                <tr class="title-row">
+                                    <th scope="col">Grade</th>
+                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                                    <th scope="col">{{grade}}</th>
+                                    {% endfor %}
+                                </tr>
+
                                 {% for race in race_order %}
-                                <th scope="col">race_map[race]</th>
+                                <tr>
+                                    <th scope="row">{{race_map[race]}}</th>
+                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                                    {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
+                                    {% if race != 'total' %}
+                                    <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                                    {% else %}
+                                    <td>{{count}}</td>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tr>
                                 {% endfor %}
+
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% else %}
+                        <span>Enrollment by grade by race not available</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="table-section">
+
+                    <div id="staff-demo-label" class="section-label">
+                        <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
+                    </div>
+
+                    <div id="staff-demo-tables" class="section-table-list">
+                        {% if missing.staff %}
+                        <table class="missing-data">
+                            <caption>Ø Missing Staff Data</caption>
+                            <tr>
+                                <th scope="col">Table</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Year</th>
                             </tr>
-                                <th scope="row">Enrollment</th>
+                            {% for id, data in missing.staff.items() %}
+                            <tr>
+                                <td>{{id_longname_map[id]}}</td>
+                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td>{{data.year}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+
+                        {% if tables.staff.staff_by_sex_by_category %}
+                        {% set staff_by_sex_by_category = tables.staff.staff_by_sex_by_category.table %}
+                        {% set year = tables.staff.staff_by_sex_by_category.year %}
+                        {% set source = tables.staff.staff_by_sex_by_category.source %}
+                        {% set url = tables.staff.staff_by_sex_by_category.url %}
+                        {% set cols = category_order + ['Total'] %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Staff by Gender by Category ({{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">F</th>
+                                    <th scope="col">M</th>
+                                </tr>
+
+                                {% for category in cols %}
+                                <tr>
+                                    <th scope="row">{{category}}</th>
+                                    <td>{{staff_by_sex_by_category['F'][category]}}</td>
+                                    <td>{{staff_by_sex_by_category['M'][category]}}</td>
+                                {% endfor %}
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
+
+                        {% if tables.staff.staff_by_category_by_education %}
+                        {% set staff_by_category_by_education = tables.staff.staff_by_category_by_education.table %}
+                        {% set year = tables.staff.staff_by_category_by_education.year %}
+                        {% set source = tables.staff.staff_by_category_by_education.source %}
+                        {% set url = tables.staff.staff_by_category_by_education.url %}
+                        <div class="data-table">
+                            <table id="staff-by-category-by-education-level">
+                                <caption>Staff by Category by Education Level (2018-2019)</caption>
+                                <tr class="title-row">
+                                    <th scope="col">Category</th>
+                                    {% for degree in degree_order %}
+                                    <th scope="col">{{degree_map[degree]}}</th>
+                                    {% endfor %}
+                                </tr>
+
+                                {% for category in category_order if category in staff_by_category_by_education %}
+                                <tr>
+                                    <th scope="row">{{category}}</th>
+                                    {% for degree in degree_order %}
+                                    <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
+                                    {% endfor %}
+                                </tr>
+
+                                {% endfor %}
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
+
+                        {% if tables.staff.staff_by_category_by_tenure %}
+                        {% set staff_by_category_by_tenure = tables.staff.staff_by_category_by_tenure.table %}
+                        {% set year = tables.staff.staff_by_category_by_tenure.year %}
+                        {% set source = tables.staff.staff_by_category_by_tenure.source %}
+                        {% set url = tables.staff.staff_by_category_by_tenure.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Staff by Category by Tenure at School (Until {{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Category</th>
+                                    {% for tenure in tenure_order %}
+                                    <th scope="col">{{tenure_map[tenure]}}</th>
+                                    {% endfor %}
+                                </tr>
+
+                                {% for category in category_order if category in staff_by_category_by_tenure %}
+                                <tr>
+                                    <th scope="row">{{category}}</th>
+                                    {% for tenure in tenure_order %}
+                                    <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% else %}
+                        <span>Staff by category by tenure not available</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="table-section">
+
+                    <div id="discipline-label" class="section-label">
+                        <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
+                    </div>
+
+                    <div id="discipline-tables" class="section-table-list">
+                        {% if missing.discipline %}
+                        <table class="missing-data">
+                            <caption>Ø Missing Discipline Data</caption>
+                            <tr>
+                                <th scope="col">Table</th>
+                                <th scope="col">Source</th>
+                                <th scope="col">Year</th>
+                            </tr>
+                            {% for id, data in missing.discipline.items() %}
+                            <tr>
+                                <td>{{id_longname_map[id]}}</td>
+                                <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
+                                <td>{{data.year}}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endif %}
+
+                        {% if tables.discipline.discipline_by_type_by_sex %}
+                        {% set discipline_by_type_by_sex = tables.discipline.discipline_by_type_by_sex.table %}
+                        {% set year = tables.discipline.discipline_by_type_by_sex.year %}
+                        {% set source = tables.discipline.discipline_by_type_by_sex.source %}
+                        {% set url = tables.discipline.discipline_by_type_by_sex.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Discipline Actions by Gender ({{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Gender</th>
+                                    <th scope="col">In-School Suspension</th>
+                                    <th scope="col">Out-of-School Suspension</th>
+                                    <th scope="col">Referral to Law Enforcement</th>
+                                </tr>
+
+                                <tr>
+                                    <th scope="row">Female</th>
+                                    <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
+                                    <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
+                                    <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Male</th>
+                                    <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
+                                    <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
+                                    <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
+
+                        {% if tables.discipline.discipline_by_type_by_race %}
+                        {% set discipline_by_type_by_race = tables.discipline.discipline_by_type_by_race.table %}
+                        {% set year = tables.discipline.discipline_by_type_by_race.year %}
+                        {% set source = tables.discipline.discipline_by_type_by_race.source %}
+                        {% set url = tables.discipline.discipline_by_type_by_race.url %}
+                        <div class="data-table">
+                            <table>
+                                <caption>Discipline Actions by Race ({{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Race</th>
+                                    <th scope="col">In-School Suspension</th>
+                                    <th scope="col">Out-of-School Suspension</th>
+                                    <th scope="col">Referral to Law Enforcement</th>
+                                </tr>
+
                                 {% for race in race_order %}
-                                <td>{{pss_enrollment_by_demographic[race]}}</td>
+                                <tr>
+                                    <th scope="row">{{race_map[race]}}</th>
+                                    <td>{{discipline_by_type_by_race['iss'][race]}}</td>
+                                    <td>{{discipline_by_type_by_race['oss'][race]}}</td>
+                                    <td>{{discipline_by_type_by_race['referral'][race]}}</td>
+                                </tr>
                                 {% endfor %}
-                            </tr>
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-
-                    {% if tables.student.pss_enrollment_by_demographic %}
-                    {% set pss_enrollment_by_demographic = tables.student.pss_enrollment_by_demographic.table %}
-                    {% set year = tables.student.pss_enrollment_by_demographic.year %}
-                    {% set source = tables.student.pss_enrollment_by_demographic.source %}
-                    {% set url = tables.student.pss_enrollment_by_demographic.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Private School Enrollment by Gender (KG and Up, {{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="row">Gender</th>
-                                <th scope="col">Male</th>
-                                <th scope="col">Female</th>
-                                <th scope="col">Total</th>
-                            </tr>
-                                <th scope="row">Enrollment</th>
-                                <td>{{pss_enrollment_by_demographic.male}}</td>
-                                <td>{{pss_enrollment_by_demographic.female}}</td>
-                                <td>{{pss_enrollment_by_demographic.total}}</td>
-                            </tr>
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% endif %}
-
-                    {% if tables.student.enrollment_grade_sex_data %}
-                    {% set enrollment_grade_sex_data = tables.student.enrollment_grade_sex_data.table %}
-                    {% set year = tables.student.enrollment_grade_sex_data.year %}
-                    {% set source = tables.student.enrollment_grade_sex_data.source %}
-                    {% set url = tables.student.enrollment_grade_sex_data.url %}
-                    {% set grades = enrollment_grade_sex_data.grades %}
-                    {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Students by Gender by Grade ({{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="col">Gender</th>
-                                {% for grade in grades %}
-                                <th scope="col">{{grade}}</th>
-                                {% endfor %}
-                                <th scope="col">Total</th>
-                            </tr>
-
-                            <tr>
-                                <th scope="row">F</th>
-                                {% for grade in grades %}
-                                <td>{{enrollment_by_sex_by_grade['F'][grade]}}</td>
-                                {% endfor %}
-                                <td>{{enrollment_by_sex_by_grade['F']['total']}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">M</th>
-                                {% for grade in grades %}
-                                <td>{{enrollment_by_sex_by_grade['M'][grade]}}</td>
-                                {% endfor %}
-                                <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
-                            </tr>
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% else %}
-                    <span>Enrollment by grade by sex not available</span>
-                    {% endif %}
-
-                    {% if tables.student.enrollment_by_grade_by_race %}
-                    {% set enrollment_by_grade_by_race = tables.student.enrollment_by_grade_by_race.table %}
-                    {% set year = tables.student.enrollment_by_grade_by_race.year %}
-                    {% set source = tables.student.enrollment_by_grade_by_race.source %}
-                    {% set url = tables.student.enrollment_by_grade_by_race.url %}
-                    <div class="data-table">
-                        <table id="students-by-grade-by-race">
-                            <caption>Students by Grade by Race ({{year}}-{{year+1}})</caption>
-                            <tr class="title-row">
-                                <th scope="col">Grade</th>
-                                {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
-                                <th scope="col">{{grade}}</th>
-                                {% endfor %}
-                            </tr>
-
-                            {% for race in race_order %}
-                            <tr>
-                                <th scope="row">{{race_map[race]}}</th>
-                                {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
-                                {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
-                                {% if race != 'total' %}
-                                <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
-                                {% else %}
-                                <td>{{count}}</td>
-                                {% endif %}
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% else %}
-                    <span>Enrollment by grade by race not available</span>
-                    {% endif %}
                 </div>
             </div>
 
-            <div class="table-section">
-
-                <div id="staff-demo-label" class="section-label">
-                    <span class="section-label-icon">&#x270f;</span><span class="section-label-title">STAFF DEMOGRAPHICS</span>
-                </div>
-
-                <div id="staff-demo-tables" class="section-table-list">
-                    {% if missing.staff %}
-                    <table class="missing-data">
-                        <caption>Ø Missing Staff Data</caption>
-                        <tr>
-                            <th scope="col">Table</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Year</th>
-                        </tr>
-                        {% for id, data in missing.staff.items() %}
-                        <tr>
-                            <td>{{id_longname_map[id]}}</td>
-                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                            <td>{{data.year}}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {% endif %}
-
-                    {% if tables.staff.staff_by_sex_by_category %}
-                    {% set staff_by_sex_by_category = tables.staff.staff_by_sex_by_category.table %}
-                    {% set year = tables.staff.staff_by_sex_by_category.year %}
-                    {% set source = tables.staff.staff_by_sex_by_category.source %}
-                    {% set url = tables.staff.staff_by_sex_by_category.url %}
-                    {% set cols = category_order + ['Total'] %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Staff by Gender by Category ({{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="col">Category</th>
-                                <th scope="col">F</th>
-                                <th scope="col">M</th>
-                            </tr>
-
-                            {% for category in cols %}
-                            <tr>
-                                <th scope="row">{{category}}</th>
-                                <td>{{staff_by_sex_by_category['F'][category]}}</td>
-                                <td>{{staff_by_sex_by_category['M'][category]}}</td>
-                            {% endfor %}
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+            <div id="footer">
+                <div id="ric-footer">
+                    <div id="ric-footer-left">
+                        <a id="ric-footer-anchor" href="http://ricracine.org"><img id="ric-footer-image" src="https://racineschools.s3.amazonaws.com/static/ric-logo.jpg" /></a>
                     </div>
-                    {% endif %}
-
-                    {% if tables.staff.staff_by_category_by_education %}
-                    {% set staff_by_category_by_education = tables.staff.staff_by_category_by_education.table %}
-                    {% set year = tables.staff.staff_by_category_by_education.year %}
-                    {% set source = tables.staff.staff_by_category_by_education.source %}
-                    {% set url = tables.staff.staff_by_category_by_education.url %}
-                    <div class="data-table">
-                        <table id="staff-by-category-by-education-level">
-                            <caption>Staff by Category by Education Level (2018-2019)</caption>
-                            <tr class="title-row">
-                                <th scope="col">Category</th>
-                                {% for degree in degree_order %}
-                                <th scope="col">{{degree_map[degree]}}</th>
-                                {% endfor %}
-                            </tr>
-
-                            {% for category in category_order if category in staff_by_category_by_education %}
-                            <tr>
-                                <th scope="row">{{category}}</th>
-                                {% for degree in degree_order %}
-                                <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
-                                {% endfor %}
-                            </tr>
-
-                            {% endfor %}
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                    <div id="ric-footer-right">
+                        <span id="ric-footer-caption">RacineSchools.com is a special project of the Racine Interfaith Coalition's Education Taskforce.<br />The Racine Interfaith Coalition is a 501(c)(3) non-profit organization made up of 27 congregations who are united in our belief in the inherent value of every individual and our shared obligation to create a fairer, more equitable and more just community.</span>
                     </div>
-                    {% endif %}
-
-                    {% if tables.staff.staff_by_category_by_tenure %}
-                    {% set staff_by_category_by_tenure = tables.staff.staff_by_category_by_tenure.table %}
-                    {% set year = tables.staff.staff_by_category_by_tenure.year %}
-                    {% set source = tables.staff.staff_by_category_by_tenure.source %}
-                    {% set url = tables.staff.staff_by_category_by_tenure.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Staff by Category by Tenure at School (Until {{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="col">Category</th>
-                                {% for tenure in tenure_order %}
-                                <th scope="col">{{tenure_map[tenure]}}</th>
-                                {% endfor %}
-                            </tr>
-
-                            {% for category in category_order if category in staff_by_category_by_tenure %}
-                            <tr>
-                                <th scope="row">{{category}}</th>
-                                {% for tenure in tenure_order %}
-                                <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% else %}
-                    <span>Staff by category by tenure not available</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="table-section">
-
-                <div id="discipline-label" class="section-label">
-                    <span class="section-label-icon">&#x270f;</span><span class="section-label-title">DISCIPLINE</span>
-                </div>
-
-                <div id="discipline-tables" class="section-table-list">
-                    {% if missing.discipline %}
-                    <table class="missing-data">
-                        <caption>Ø Missing Discipline Data</caption>
-                        <tr>
-                            <th scope="col">Table</th>
-                            <th scope="col">Source</th>
-                            <th scope="col">Year</th>
-                        </tr>
-                        {% for id, data in missing.discipline.items() %}
-                        <tr>
-                            <td>{{id_longname_map[id]}}</td>
-                            <td><a class="standard-link" href="{{data.url}}">{{data.source}}</a></td>
-                            <td>{{data.year}}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {% endif %}
-
-                    {% if tables.discipline.discipline_by_type_by_sex %}
-                    {% set discipline_by_type_by_sex = tables.discipline.discipline_by_type_by_sex.table %}
-                    {% set year = tables.discipline.discipline_by_type_by_sex.year %}
-                    {% set source = tables.discipline.discipline_by_type_by_sex.source %}
-                    {% set url = tables.discipline.discipline_by_type_by_sex.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Discipline Actions by Gender ({{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="col">Gender</th>
-                                <th scope="col">In-School Suspension</th>
-                                <th scope="col">Out-of-School Suspension</th>
-                                <th scope="col">Referral to Law Enforcement</th>
-                            </tr>
-
-                            <tr>
-                                <th scope="row">Female</th>
-                                <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
-                                <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
-                                <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">Male</th>
-                                <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
-                                <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
-                                <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
-                            </tr>
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% endif %}
-
-                    {% if tables.discipline.discipline_by_type_by_race %}
-                    {% set discipline_by_type_by_race = tables.discipline.discipline_by_type_by_race.table %}
-                    {% set year = tables.discipline.discipline_by_type_by_race.year %}
-                    {% set source = tables.discipline.discipline_by_type_by_race.source %}
-                    {% set url = tables.discipline.discipline_by_type_by_race.url %}
-                    <div class="data-table">
-                        <table>
-                            <caption>Discipline Actions by Race ({{year}}-{{year+1}})</caption>
-                            <tr>
-                                <th scope="col">Race</th>
-                                <th scope="col">In-School Suspension</th>
-                                <th scope="col">Out-of-School Suspension</th>
-                                <th scope="col">Referral to Law Enforcement</th>
-                            </tr>
-
-                            {% for race in race_order %}
-                            <tr>
-                                <th scope="row">{{race_map[race]}}</th>
-                                <td>{{discipline_by_type_by_race['iss'][race]}}</td>
-                                <td>{{discipline_by_type_by_race['oss'][race]}}</td>
-                                <td>{{discipline_by_type_by_race['referral'][race]}}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                        <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <div id="footer">
-            <div id="ric-footer">
-                <div id="ric-footer-left">
-                    <a id="ric-footer-anchor" href="http://ricracine.org"><img id="ric-footer-image" src="https://racineschools.s3.amazonaws.com/static/ric-logo.jpg" /></a>
-                </div>
-                <div id="ric-footer-right">
-                    <span id="ric-footer-caption">RacineSchools.com is a special project of the Racine Interfaith Coalition's Education Taskforce.<br />The Racine Interfaith Coalition is a 501(c)(3) non-profit organization made up of 27 congregations who are united in our belief in the inherent value of every individual and our shared obligation to create a fairer, more equitable and more just community.</span>
                 </div>
             </div>
         </div>
