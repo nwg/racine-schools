@@ -158,6 +158,10 @@ div.small-summary span {
    font-size: 16pt;
 }
 
+#report-card-info > * {
+    display: block;
+}
+
 #summary-info {
     font-size: 16pt;
     margin-top: 1em;
@@ -416,7 +420,16 @@ a.header-block:hover {
                 </div>
 
                 <div id="report-card-info">
+                    {% if school.report1 %}
                     <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">State Report Card</a></span>
+                    {% else %}
+                    <span style="font-weight: bold; text-decoration: line-through;">State Report Card</span>
+                    {% endif %}
+
+                    {% if school.report2 %}
+                    <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">State Report Card (Choice Students Only)</a></span>
+                    {% endif %}
+
                 </div>
 
                 <div id="summary-info">
