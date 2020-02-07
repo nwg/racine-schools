@@ -141,8 +141,9 @@ def student_tables(is_private, nces_id, ppin):
         return d
 
     if nces_id == None:
-        missing['enrollment_grade_sex_data'] = ncesdict()
-        missing['enrollment_by_grade_by_race'] = ncesdict()
+        if not is_private:
+            missing['enrollment_grade_sex_data'] = ncesdict()
+            missing['enrollment_by_grade_by_race'] = ncesdict()
     else:
         enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, nces_id)
         if enrollment_grade_sex_data == None:
