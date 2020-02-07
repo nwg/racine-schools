@@ -49,7 +49,7 @@ def render_school_summary_with_name(name):
     nces_id = school['nces_id']
     ppin = school['pss_ppin']
 
-    assert state_lea_id in ('4620', '8110'), 'Unrecognized Racine LEA ID'
+    assert state_lea_id in (None, '4620', '8110'), 'Unrecognized Racine LEA ID'
     school['district_name'] = 'Racine Unified' if state_lea_id == '4620' else '21st Century Preparatory School'
 
     tables = {}
@@ -212,9 +212,9 @@ def get_pss_info(cur, ppin):
 
     return cur.fetchone()
 
-def get_pss_enrollment_by_grade(cur, ppin):
+def get_pss_enrollment_by_grade(cur, year, ppin):
     def query_pss_enrollment():
-        where = andd([idequals('year', 2017), idequals('ppin', ppin)])
+        where = andd([idequals('year', year), idequals('ppin', ppin)])
         return select('pss_enrollment_grade_counts', (sql.Identifier('grade'), sql.Identifier('enrollment')), where=where)
     q = query_pss_enrollment()
     cur.execute(q)
@@ -224,9 +224,9 @@ def get_pss_enrollment_by_grade(cur, ppin):
 
     return enrollment_by_grade
 
-def get_pss_enrollment_by_demographic(cur, ppin):
+def get_pss_enrollment_by_demographic(cur, year, ppin):
     def query_pss_enrollment():
-        where = andd([idequals('year', 2017), idequals('ppin', ppin)])
+        where = andd([idequals('year', year), idequals('ppin', ppin)])
         return select('pss_enrollment_demographic_counts', '*', where=where)
     q = query_pss_enrollment()
     cur.execute(q)

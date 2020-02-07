@@ -518,7 +518,7 @@ a.header-block:hover {
                         {% endif %}
 
                         {% if tables.student.pss_enrollment_by_grade %}
-                        {% set pss_enollment_by_grade = tables.student.pss_enrollment_by_grade %}
+                        {% set pss_enrollment_by_grade = tables.student.pss_enrollment_by_grade.table %}
                         {% set year = tables.student.pss_enrollment_by_grade.year %}
                         {% set source = tables.student.pss_enrollment_by_grade.source %}
                         {% set url = tables.student.pss_enrollment_by_grade.url %}
@@ -559,7 +559,7 @@ a.header-block:hover {
                                 <tr>
                                     <th scope="row">Race</th>
                                     {% for race in race_order %}
-                                    <th scope="col">race_map[race]</th>
+                                    <th scope="col">{{race_map[race]}}</th>
                                     {% endfor %}
                                 </tr>
                                     <th scope="row">Enrollment</th>
@@ -775,8 +775,6 @@ a.header-block:hover {
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
-                        {% else %}
-                        <span>Staff by category by tenure not available</span>
                         {% endif %}
                     </div>
                 </div>
