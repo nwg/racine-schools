@@ -71,6 +71,7 @@ def schools():
             d['mission'] = row['Mission'] or None
             d['report1'] = report_url(get_maybe(row['Report1'])) or None
             d['report2'] = report_url(get_maybe(row['Report2'])) or None
+            d['affiliation'] = row['Affiliation'] or None
             d['logo'] = logo_url(row['Logo'])
             d['disadvantaged_pct'] = strip_star(get_maybe(row['Economically Disadvantaged'])) or None
             d['curriculum_focus'] = row['Curriculum Focus'] or None

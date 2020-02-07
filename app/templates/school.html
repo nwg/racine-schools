@@ -36,12 +36,6 @@
 ] %}
 {% set tenure_order = ('1_2', '3_4', '5_plus') %}
 {% set tenure_map = dict(tenure_pairs) %}
-{% if pss_info is defined and pss_info.label %}
-{% set private_affiliation = pss_info.label %}
-{% else %}
-{% set private_affiliation = 'Independent' %}
-{% endif %}
-{% set public_affiliation = school.district_name %}
 {% set id_longname_map = dict([
     ('pss_enrollment_by_grade', 'Enrollment By Grade'),
     ('pss_enrollment_by_demographic', 'Enrollment by Race and Gender'),
@@ -165,7 +159,7 @@ div.small-summary span {
 #summary-info {
     font-size: 16pt;
     margin-top: 1em;
-    margin-bottom: 4rem;
+    margin-bottom: 2.5rem;
 }
 
 #summary-info span {
@@ -435,12 +429,7 @@ a.header-block:hover {
                 <div id="summary-info">
                     <span class="underline bold">Summary Data (as of 2018-2019 School Year)</span> <br />
                     <div id="summary-info-data">
-                    {% if school.is_private %}
-                        <span class="bold">Affiliation: Private, </span><span>{{private_affiliation}}</span> <br />
-                        {% else %}
-                        <span class="bold">Affiliation:&nbsp;</span><span>Public, {{public_affiliation}}</span> <br />
-                        {% endif %}
-
+                        <span class="bold">Affiliation:&nbsp</span><span>{{school.affiliation}}</span> <br />
                         <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
                         <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
                         {% if school.disadvantaged_pct %}
@@ -497,8 +486,8 @@ a.header-block:hover {
                     <span>Private School Data not available</span>
                     {% endif %}
                     </div>
-                    <hr style="margin-top: 3em;" />
                 </div>
+                <hr />
 
 
             </div>

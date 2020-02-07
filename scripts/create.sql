@@ -33,6 +33,7 @@ create table schools (
     mission text,
     report1 text,
     report2 text,
+    affiliation text,
     logo text,
     disadvantaged_pct NUMERIC(5, 2),
     curriculum_focus text,
