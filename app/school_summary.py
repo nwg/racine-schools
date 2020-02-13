@@ -67,7 +67,11 @@ def render_school_summary_with_name(name):
     tables['summary'] = {}
     missing['summary'] = {}
     if ppin != None:
-        tables['summary']['pss_info'] = pssdict(table=get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin))
+        pss_info = get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin)
+        if pss_info != None:
+            tables['summary']['pss_info'] = pss_info
+        else:
+            missing['summary']['pss_info'] = pssdict()
     else:
         missing['summary']['pss_info'] = pssdict()
 
