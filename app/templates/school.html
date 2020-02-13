@@ -417,9 +417,9 @@ a.header-block:hover {
 
                 <div id="report-card-info">
                     {% if school.report1 %}
-                    <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">State Report Card</a></span>
-                    {% else %}
-                    <span style="font-weight: bold; text-decoration: line-through;">State Report Card</span>
+                    <span style="font-weight: bold;"><a class="standard-link" href="{{school.report1}}">{{ 'State Report Card - All Students' if school.is_private else 'State Report Card'}}</a></span>
+                    {% elif not school.report2 %}
+                    <span>No state report card is available for this school</span>
                     {% endif %}
 
                     {% if school.report2 %}
