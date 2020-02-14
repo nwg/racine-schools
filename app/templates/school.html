@@ -476,29 +476,26 @@ a.header-block:hover {
                         {% endif %}
 
                         {% if tables.student.pss_enrollment_by_grade %}
-                        {% set pss_enrollment_by_grade = tables.student.pss_enrollment_by_grade.table %}
-                        {% set year = tables.student.pss_enrollment_by_grade.year %}
-                        {% set source = tables.student.pss_enrollment_by_grade.source %}
-                        {% set url = tables.student.pss_enrollment_by_grade.url %}
+                        {% set data = tables.student.pss_enrollment_by_grade %}
+                        {% set pss_enrollment_by_grade = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
                         <div class="data-table">
                             <table>
-                                <caption>Private School Enrollment by Grade</caption>
+                                <caption>Private School Enrollment by Grade ({{year}}-{{year+1}})</caption>
                                 <tr>
                                     <th scope="row">Grade</th>
                                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                                     <th scope="col">{{grade}}</th>
                                     {% endfor %}
-                                    {% if pss_info is defined and pss_info %}
                                     <th scope="col">Total</th>
-                                    {% endif %}
                                 </tr>
                                     <th scope="row">Enrollment</th>
                                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                                     <td>{{pss_enrollment_by_grade[grade]}}</td>
                                     {% endfor %}
-                                    {% if pss_info is defined and pss_info %}
-                                    <td>{{pss_info.enrollment}}</td>
-                                    {% endif %}
+                                    <td>{{pss_enrollment_by_grade.values() | sum}}</td>
                                 </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
