@@ -39,7 +39,7 @@
 {% set id_longname_map = dict([
     ('pss_enrollment_by_grade', 'Enrollment By Grade'),
     ('pss_enrollment_by_demographic', 'Enrollment by Race and Gender'),
-    ('enrollment_grade_sex_data', 'Enrollment by Grade and Gender'),
+    ('enrollment_by_grade_by_sex', 'Enrollment by Grade and Gender'),
     ('enrollment_by_grade_by_race', 'Enrollment by Grade and Race'),
     ('discipline_by_type_by_sex', 'Discipline by Type by Sex'),
     ('discipline_by_type_by_race', 'Discipline by Type by Race'),
@@ -554,13 +554,14 @@ a.header-block:hover {
                         </div>
                         {% endif %}
 
-                        {% if tables.student.enrollment_grade_sex_data %}
-                        {% set enrollment_grade_sex_data = tables.student.enrollment_grade_sex_data.table %}
-                        {% set year = tables.student.enrollment_grade_sex_data.year %}
-                        {% set source = tables.student.enrollment_grade_sex_data.source %}
-                        {% set url = tables.student.enrollment_grade_sex_data.url %}
-                        {% set grades = enrollment_grade_sex_data.grades %}
-                        {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
+                        {% if tables.student.enrollment_by_sex_by_grade %}
+                        {% set data = tables.student.enrollment_by_sex_by_grade %}
+                        {% set enrollment_grade_sex_data = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
+                        {% set grades = data.grades %}
+                        {% set enrollment_by_sex_by_grade = data.table %}
                         <div class="data-table">
                             <table>
                                 <caption>Students by Gender by Grade ({{year}}-{{year+1}})</caption>
@@ -599,31 +600,35 @@ a.header-block:hover {
                         {% endif %}
 
                         {% if tables.student.enrollment_by_grade_by_race %}
-                        {% set enrollment_by_grade_by_race = tables.student.enrollment_by_grade_by_race.table %}
-                        {% set year = tables.student.enrollment_by_grade_by_race.year %}
-                        {% set source = tables.student.enrollment_by_grade_by_race.source %}
-                        {% set url = tables.student.enrollment_by_grade_by_race.url %}
+                        {% set data = tables.student.enrollment_by_grade_by_race %}
+                        {% set enrollment_by_grade_by_race = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
+                        {% set grades = data.grades %}
                         <div class="data-table">
                             <table id="students-by-grade-by-race">
                                 <caption>Students by Grade by Race ({{year}}-{{year+1}})</caption>
                                 <tr class="title-row">
                                     <th scope="col">Grade</th>
-                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                                    {% for grade in grades %}
                                     <th scope="col">{{grade}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for race in race_order %}
                                 <tr>
                                     <th scope="row">{{race_map[race]}}</th>
-                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
-                                    {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
+                                    {% for grade in grades %}
+                                    {% set d = enrollment_by_grade_by_race[grade][race] %}
                                     {% if race != 'total' %}
-                                    <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                                    <td>{{d.count}} ({{'%.1f'|format(d.percent)}}%)</td>
                                     {% else %}
-                                    <td>{{count}}</td>
+                                    <td>{{d.count}}</td>
                                     {% endif %}
                                     {% endfor %}
+                                    <td>{{enrollment_by_grade_by_race.values() | sum(attribute="{}.count".format(race))}}</td>
                                 </tr>
                                 {% endfor %}
 

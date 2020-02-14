@@ -4,6 +4,7 @@ from app import db
 from app.db import conn, cur
 from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
+from itertools import repeat
 
 MOST_RECENT_STAFF_YEAR = 2018
 MOST_RECENT_PSS_YEAR = 2017
@@ -49,6 +50,16 @@ STAFF_CATEGORIES = (
 )
 
 GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
+
+def convert_grade(grade):
+    return int(grade) if grade.isdigit() else grade
+
+def get_grades(low_grade, high_grade):
+    start_idx = GRADES_ORDER.index(low_grade)
+    end_idx = GRADES_ORDER.index(high_grade)
+
+    grades = GRADES_ORDER[start_idx:end_idx+1]
+    return [ convert_grade(grade) for grade in grades ]
 
 def pssdict(**extra):
     d = {
@@ -144,6 +155,9 @@ def student_tables(school):
     is_private = school['is_private']
     nces_id = school['nces_id']
     ppin = school['pss_ppin']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
+    grades = get_grades(low_grade, high_grade)
 
     tables = {}
     missing = {}
@@ -166,20 +180,20 @@ def student_tables(school):
 
     if nces_id == None:
         if not is_private:
-            missing['enrollment_grade_sex_data'] = ncesdict()
+            missing['enrollment_by_sex_by_grade'] = ncesdict()
             missing['enrollment_by_grade_by_race'] = ncesdict()
     else:
-        enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, school)
-        if enrollment_grade_sex_data == None:
-            missing['enrollment_grade_sex_data'] = ncesdict()
+        enrollment_by_sex_by_grade = get_enrollment_by_sex_by_grade(cur, MOST_RECENT_NCES_YEAR, school)
+        if enrollment_by_sex_by_grade == None:
+            missing['enrollment_by_sex_by_grade'] = ncesdict()
         else:
-            tables['enrollment_grade_sex_data'] = ncesdict(table=enrollment_grade_sex_data)
+            tables['enrollment_by_sex_by_grade'] = ncesdict(table=enrollment_by_sex_by_grade, grades=grades)
 
-        enrollment_by_grade_by_race = get_enrollment_by_grade_by_race(cur, MOST_RECENT_NCES_YEAR, nces_id)
+        enrollment_by_grade_by_race = get_enrollment_by_grade_by_race(cur, MOST_RECENT_NCES_YEAR, school)
         if enrollment_by_grade_by_race == None:
             missing['enrollment_by_grade_by_race'] = ncesdict()
         else:
-            tables['enrollment_by_grade_by_race'] = ncesdict(table=enrollment_by_grade_by_race)
+            tables['enrollment_by_grade_by_race'] = ncesdict(table=enrollment_by_grade_by_race, grades=grades)
 
     return tables, missing
 
@@ -258,15 +272,7 @@ def get_pss_enrollment_by_demographic(cur, year, ppin):
 
     return cur.fetchone()
 
-def get_grades(low_grade, high_grade):
-    start_idx = GRADES_ORDER.index(low_grade)
-    end_idx = GRADES_ORDER.index(high_grade)
-
-    grades = GRADES_ORDER[start_idx:end_idx+1]
-    return [ int(grade) if grade.isdigit() else grade for grade in grades ]
-
-
-def get_enrollment_grade_sex_data(cur, year, school):
+def get_enrollment_by_sex_by_grade(cur, year, school):
     nces_id = school['nces_id']
     low_grade = school['low_grade']
     high_grade = school['high_grade']
@@ -294,8 +300,6 @@ def get_enrollment_grade_sex_data(cur, year, school):
 
         return query
 
-    cur.execute(query_sex_enrollment_counts())
-
     grades = get_grades(low_grade, high_grade)
     enrollment_by_sex_by_grade = {}
     for sex in 'M', 'F':
@@ -305,18 +309,21 @@ def get_enrollment_grade_sex_data(cur, year, school):
         d['total'] = 0
         enrollment_by_sex_by_grade[sex] = d
 
+    cur.execute(query_sex_enrollment_counts())
     for grade, sex, total in cur.fetchall():
+        grade = convert_grade(grade)
         by_grade = enrollment_by_sex_by_grade[sex]
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
         enrollment_by_sex_by_grade[sex] = by_grade
 
-    return {
-        'enrollment_by_sex_by_grade': enrollment_by_sex_by_grade,
-        'grades': grades
-    }
+    return enrollment_by_sex_by_grade
 
-def get_enrollment_by_grade_by_race(cur, year, nces_id):
+def get_enrollment_by_grade_by_race(cur, year, school):
+    nces_id = school['nces_id']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
+
     check_where = andd([
         idequals('year', year),
         idequals('nces_id', nces_id)
@@ -345,18 +352,25 @@ def get_enrollment_by_grade_by_race(cur, year, nces_id):
 
         return query
 
-    cur.execute(query_race_enrollment_counts())
     enrollment_by_grade_by_race = {}
+    grades = get_grades(low_grade, high_grade)
+    for grade in grades:
+        enrollment_by_grade_by_race[grade] = zip(RACE_COLS, repeat(0), repeat(0.0))
+
+    cur.execute(query_race_enrollment_counts())
     for row in cur.fetchall():
-        grade = row[0]
+        grade = convert_grade(row[0])
         races = row[1:]
-        if races[-1] > 0:
-            race_percent = [ count / float(races[-1]) * 100 for count in races ]
-        else:
-            assert all(count == 0 for count in races), races
-            race_percent = [ 0.0 ] * len(races)
         assert len(races) == len(RACE_COLS)
-        race_dict = dict(zip(RACE_COLS, zip(races, race_percent)))
+        if races[-1] == 0: # total
+            assert all(count == 0 for count in races), races
+            continue
+
+        race_percent = [ count / float(races[-1]) * 100 for count in races ]
+        race_dict = {}
+        for race, count, percent in zip(RACE_COLS, races, race_percent):
+            race_dict[race] = { 'count': count, 'percent': percent }
+
         enrollment_by_grade_by_race[grade] = race_dict
 
     return enrollment_by_grade_by_race
