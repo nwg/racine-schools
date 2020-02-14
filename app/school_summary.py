@@ -460,12 +460,22 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
         (q_5_plus, '5_plus'),
     )
 
+    tenure_keys = [ item[1] for item in tenure_items ]
+
     staff_by_category_by_tenure = {}
     for query, key in tenure_items:
         cur.execute(query)
         for category, count in cur.fetchall():
             by_tenure = staff_by_category_by_tenure.get(category, {})
             by_tenure[key] = count
+            staff_by_category_by_tenure[category] = by_tenure
+
+    for tenure in tenure_keys:
+        for category in STAFF_CATEGORIES:
+            by_tenure = staff_by_category_by_tenure.get(category, {})
+            if tenure not in by_tenure:
+                by_tenure[tenure] = 0
+            by_tenure['Total'] = by_tenure.get('Total', 0) + by_tenure[tenure]
             staff_by_category_by_tenure[category] = by_tenure
 
     return staff_by_category_by_tenure

@@ -731,6 +731,7 @@ a.header-block:hover {
                                     {% for tenure in tenure_order %}
                                     <th scope="col">{{tenure_map[tenure]}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for category in category_order if category in staff_by_category_by_tenure %}
@@ -739,8 +740,16 @@ a.header-block:hover {
                                     {% for tenure in tenure_order %}
                                     <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
                                     {% endfor %}
+                                    <td>{{staff_by_category_by_tenure[category]['Total']}}</td>
                                 </tr>
                                 {% endfor %}
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for tenure in tenure_order %}
+                                    <td>{{staff_by_category_by_tenure.values() | sum(attribute=tenure)}}</td>
+                                    {% endfor %}
+                                    <td>{{staff_by_category_by_tenure.values() | sum(attribute='Total')}}</td>
+                                </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
