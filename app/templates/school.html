@@ -807,6 +807,7 @@ a.header-block:hover {
                                     <th scope="col">In-School Suspension</th>
                                     <th scope="col">Out-of-School Suspension</th>
                                     <th scope="col">Referral to Law Enforcement</th>
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 <tr>
@@ -814,12 +815,24 @@ a.header-block:hover {
                                     <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
                                     <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
                                     <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
+                                    <td>{{discipline_by_type_by_sex.values() | sum(attribute='F')}}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Male</th>
                                     <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
                                     <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
                                     <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
+                                    <td>{{discipline_by_type_by_sex.values() | sum(attribute='M')}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% set iss_total = discipline_by_type_by_sex['iss'].values() | sum %}
+                                    {% set oss_total = discipline_by_type_by_sex['oss'].values() | sum %}
+                                    {% set referral_total = discipline_by_type_by_sex['referral'].values() | sum %}
+                                    <td>{{iss_total}}</td>
+                                    <td>{{oss_total}}</td>
+                                    <td>{{referral_total}}</td>
+                                    <td>{{iss_total + oss_total + referral_total}}</td>
                                 </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
@@ -839,6 +852,7 @@ a.header-block:hover {
                                     <th scope="col">In-School Suspension</th>
                                     <th scope="col">Out-of-School Suspension</th>
                                     <th scope="col">Referral to Law Enforcement</th>
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for race in race_order %}
@@ -847,6 +861,7 @@ a.header-block:hover {
                                     <td>{{discipline_by_type_by_race['iss'][race]}}</td>
                                     <td>{{discipline_by_type_by_race['oss'][race]}}</td>
                                     <td>{{discipline_by_type_by_race['referral'][race]}}</td>
+                                    <td>{{discipline_by_type_by_race.values() | sum(attribute=race)}}</td>
                                 </tr>
                                 {% endfor %}
                             </table>

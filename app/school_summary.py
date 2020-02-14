@@ -549,7 +549,7 @@ def get_discipline_by_type_by_sex(cur, year, nces_id):
         table = sql.Identifier('discipline_counts')
         orr_categories = orr(idequals('category', category) for category in categories)
 
-        statement = sql.SQL("""select sex, sum(total::integer) as total from {} where {} group by sex""").format(
+        statement = sql.SQL("""select sex, sum(total::integer) as count from {} where {} group by sex""").format(
             table,
             andd([
                 idequals('nces_id', nces_id),
