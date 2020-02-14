@@ -586,6 +586,13 @@ a.header-block:hover {
                                     {% endfor %}
                                     <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
                                 </tr>
+
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for grade in grades %}
+                                    <td>{{enrollment_by_sex_by_grade.values() | sum(attribute=grade)}}</td>
+                                    {% endfor %}
+                                    <td>{{enrollment_by_sex_by_grade.values() | sum(attribute='total')}}</td>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>

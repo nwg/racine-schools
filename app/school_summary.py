@@ -284,15 +284,23 @@ def get_enrollment_grade_sex_data(cur, year, nces_id):
     grades = set()
     enrollment_by_sex_by_grade = {}
     for grade, sex, total in cur.fetchall():
+        if grade.isdigit():
+            grade = int(grade)
+
         grades.add(grade)
         by_grade = enrollment_by_sex_by_grade.get(sex, {})
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
         enrollment_by_sex_by_grade[sex] = by_grade
 
+    def gradekey(g):
+        if type(g) == int:
+            g = f'{g:02d}'
+        return GRADES_ORDER.index(g)
+
     return {
         'enrollment_by_sex_by_grade': enrollment_by_sex_by_grade,
-        'grades': sorted(grades, key=lambda x: GRADES_ORDER.index(x))
+        'grades': sorted(grades, key=gradekey)
     }
 
 def get_enrollment_by_grade_by_race(cur, year, nces_id):
