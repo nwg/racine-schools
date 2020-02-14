@@ -28,7 +28,7 @@
     ('pss', "NCES Private School Universe Survey"),
 ]) %}
 
-{% set degree_order = ('associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other') %}
+{% set degree_order = ['associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other'] %}
 {% set tenure_pairs = [
     ('1_2', "1-2 Years"),
     ('3_4', "3-4 Years"),
@@ -685,6 +685,8 @@ a.header-block:hover {
                         {% set year = tables.staff.staff_by_category_by_education.year %}
                         {% set source = tables.staff.staff_by_category_by_education.source %}
                         {% set url = tables.staff.staff_by_category_by_education.url %}
+                        {% set rows = category_order %}
+                        {% set cols = degree_order + ['Total'] %}
                         <div class="data-table">
                             <table id="staff-by-category-by-education-level">
                                 <caption>Staff by Category by Education Level (2018-2019)</caption>
@@ -693,17 +695,24 @@ a.header-block:hover {
                                     {% for degree in degree_order %}
                                     <th scope="col">{{degree_map[degree]}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
-                                {% for category in category_order if category in staff_by_category_by_education %}
+                                {% for category in rows %}
                                 <tr>
                                     <th scope="row">{{category}}</th>
-                                    {% for degree in degree_order %}
+                                    {% for degree in cols %}
                                     <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
                                     {% endfor %}
                                 </tr>
-
                                 {% endfor %}
+
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for degree in cols %}
+                                    <td>{{ '%.1f' | format(staff_by_category_by_education.values() | sum(attribute=degree)) }}</td>
+                                    {% endfor %}
+                                </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>

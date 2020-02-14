@@ -31,6 +31,15 @@ EDUCATION_MAP = {
     None: 'unreported',
 }
 
+STAFF_EDUCATION_LEVELS = [
+    'associate',
+    'bachelors',
+    'masters',
+    'six_year_specialists',
+    'doctorate',
+    'other'
+]
+
 STAFF_CATEGORIES = (
     'Teachers',
     'Administrators',
@@ -400,8 +409,14 @@ def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id)
         by_education[EDUCATION_MAP[education_level]] = count
         staff_by_category_by_education[category] = by_education
 
-    if not staff_by_category_by_education:
-        return None
+
+    for category in STAFF_CATEGORIES:
+        for education in STAFF_EDUCATION_LEVELS:
+            by_education = staff_by_category_by_education.get(category, {})
+            if education not in by_education:
+                by_education[education] = 0
+            by_education['Total'] = by_education.get('Total', 0) + by_education[education]
+
 
     return staff_by_category_by_education
 
