@@ -28,7 +28,7 @@
     ('pss', "NCES Private School Universe Survey"),
 ]) %}
 
-{% set degree_order = ('associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other') %}
+{% set degree_order = ['associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other'] %}
 {% set tenure_pairs = [
     ('1_2', "1-2 Years"),
     ('3_4', "3-4 Years"),
@@ -39,7 +39,7 @@
 {% set id_longname_map = dict([
     ('pss_enrollment_by_grade', 'Enrollment By Grade'),
     ('pss_enrollment_by_demographic', 'Enrollment by Race and Gender'),
-    ('enrollment_grade_sex_data', 'Enrollment by Grade and Gender'),
+    ('enrollment_by_grade_by_sex', 'Enrollment by Grade and Gender'),
     ('enrollment_by_grade_by_race', 'Enrollment by Grade and Race'),
     ('discipline_by_type_by_sex', 'Discipline by Type by Sex'),
     ('discipline_by_type_by_race', 'Discipline by Type by Race'),
@@ -476,29 +476,26 @@ a.header-block:hover {
                         {% endif %}
 
                         {% if tables.student.pss_enrollment_by_grade %}
-                        {% set pss_enrollment_by_grade = tables.student.pss_enrollment_by_grade.table %}
-                        {% set year = tables.student.pss_enrollment_by_grade.year %}
-                        {% set source = tables.student.pss_enrollment_by_grade.source %}
-                        {% set url = tables.student.pss_enrollment_by_grade.url %}
+                        {% set data = tables.student.pss_enrollment_by_grade %}
+                        {% set pss_enrollment_by_grade = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
                         <div class="data-table">
                             <table>
-                                <caption>Private School Enrollment by Grade</caption>
+                                <caption>Private School Enrollment by Grade ({{year}}-{{year+1}})</caption>
                                 <tr>
                                     <th scope="row">Grade</th>
                                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                                     <th scope="col">{{grade}}</th>
                                     {% endfor %}
-                                    {% if pss_info is defined and pss_info %}
                                     <th scope="col">Total</th>
-                                    {% endif %}
                                 </tr>
                                     <th scope="row">Enrollment</th>
                                     {% for grade in grade_order if grade in pss_enrollment_by_grade %}
                                     <td>{{pss_enrollment_by_grade[grade]}}</td>
                                     {% endfor %}
-                                    {% if pss_info is defined and pss_info %}
-                                    <td>{{pss_info.enrollment}}</td>
-                                    {% endif %}
+                                    <td>{{pss_enrollment_by_grade.values() | sum}}</td>
                                 </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
@@ -554,13 +551,14 @@ a.header-block:hover {
                         </div>
                         {% endif %}
 
-                        {% if tables.student.enrollment_grade_sex_data %}
-                        {% set enrollment_grade_sex_data = tables.student.enrollment_grade_sex_data.table %}
-                        {% set year = tables.student.enrollment_grade_sex_data.year %}
-                        {% set source = tables.student.enrollment_grade_sex_data.source %}
-                        {% set url = tables.student.enrollment_grade_sex_data.url %}
-                        {% set grades = enrollment_grade_sex_data.grades %}
-                        {% set enrollment_by_sex_by_grade = enrollment_grade_sex_data.enrollment_by_sex_by_grade %}
+                        {% if tables.student.enrollment_by_sex_by_grade %}
+                        {% set data = tables.student.enrollment_by_sex_by_grade %}
+                        {% set enrollment_grade_sex_data = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
+                        {% set grades = data.grades %}
+                        {% set enrollment_by_sex_by_grade = data.table %}
                         <div class="data-table">
                             <table>
                                 <caption>Students by Gender by Grade ({{year}}-{{year+1}})</caption>
@@ -586,37 +584,48 @@ a.header-block:hover {
                                     {% endfor %}
                                     <td>{{enrollment_by_sex_by_grade['M']['total']}}</td>
                                 </tr>
+
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for grade in grades %}
+                                    <td>{{enrollment_by_sex_by_grade.values() | sum(attribute=grade)}}</td>
+                                    {% endfor %}
+                                    <td>{{enrollment_by_sex_by_grade.values() | sum(attribute='total')}}</td>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
                         {% endif %}
 
                         {% if tables.student.enrollment_by_grade_by_race %}
-                        {% set enrollment_by_grade_by_race = tables.student.enrollment_by_grade_by_race.table %}
-                        {% set year = tables.student.enrollment_by_grade_by_race.year %}
-                        {% set source = tables.student.enrollment_by_grade_by_race.source %}
-                        {% set url = tables.student.enrollment_by_grade_by_race.url %}
+                        {% set data = tables.student.enrollment_by_grade_by_race %}
+                        {% set enrollment_by_grade_by_race = data.table %}
+                        {% set year = data.year %}
+                        {% set source = data.source %}
+                        {% set url = data.url %}
+                        {% set grades = data.grades %}
                         <div class="data-table">
                             <table id="students-by-grade-by-race">
                                 <caption>Students by Grade by Race ({{year}}-{{year+1}})</caption>
                                 <tr class="title-row">
                                     <th scope="col">Grade</th>
-                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
+                                    {% for grade in grades %}
                                     <th scope="col">{{grade}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for race in race_order %}
                                 <tr>
                                     <th scope="row">{{race_map[race]}}</th>
-                                    {% for grade in grade_order if grade in enrollment_by_grade_by_race %}
-                                    {% set count, percent = enrollment_by_grade_by_race[grade][race] %}
+                                    {% for grade in grades %}
+                                    {% set d = enrollment_by_grade_by_race[grade][race] %}
                                     {% if race != 'total' %}
-                                    <td>{{count}} ({{'%.1f'|format(percent)}}%)</td>
+                                    <td>{{d.count}} ({{'%.1f'|format(d.percent)}}%)</td>
                                     {% else %}
-                                    <td>{{count}}</td>
+                                    <td>{{d.count}}</td>
                                     {% endif %}
                                     {% endfor %}
+                                    <td>{{enrollment_by_grade_by_race.values() | sum(attribute="{}.count".format(race))}}</td>
                                 </tr>
                                 {% endfor %}
 
@@ -665,6 +674,7 @@ a.header-block:hover {
                                     <th scope="col">Category</th>
                                     <th scope="col">F</th>
                                     <th scope="col">M</th>
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for category in cols %}
@@ -672,6 +682,7 @@ a.header-block:hover {
                                     <th scope="row">{{category}}</th>
                                     <td>{{staff_by_sex_by_category['F'][category]}}</td>
                                     <td>{{staff_by_sex_by_category['M'][category]}}</td>
+                                    <td>{{staff_by_sex_by_category['M'][category] + staff_by_sex_by_category['M'][category]}}</td>
                                 {% endfor %}
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
@@ -683,6 +694,8 @@ a.header-block:hover {
                         {% set year = tables.staff.staff_by_category_by_education.year %}
                         {% set source = tables.staff.staff_by_category_by_education.source %}
                         {% set url = tables.staff.staff_by_category_by_education.url %}
+                        {% set rows = category_order %}
+                        {% set cols = degree_order + ['Total'] %}
                         <div class="data-table">
                             <table id="staff-by-category-by-education-level">
                                 <caption>Staff by Category by Education Level (2018-2019)</caption>
@@ -691,17 +704,24 @@ a.header-block:hover {
                                     {% for degree in degree_order %}
                                     <th scope="col">{{degree_map[degree]}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
-                                {% for category in category_order if category in staff_by_category_by_education %}
+                                {% for category in rows %}
                                 <tr>
                                     <th scope="row">{{category}}</th>
-                                    {% for degree in degree_order %}
+                                    {% for degree in cols %}
                                     <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
                                     {% endfor %}
                                 </tr>
-
                                 {% endfor %}
+
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for degree in cols %}
+                                    <td>{{ '%.1f' | format(staff_by_category_by_education.values() | sum(attribute=degree)) }}</td>
+                                    {% endfor %}
+                                </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
@@ -720,6 +740,7 @@ a.header-block:hover {
                                     {% for tenure in tenure_order %}
                                     <th scope="col">{{tenure_map[tenure]}}</th>
                                     {% endfor %}
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for category in category_order if category in staff_by_category_by_tenure %}
@@ -728,8 +749,16 @@ a.header-block:hover {
                                     {% for tenure in tenure_order %}
                                     <td>{{staff_by_category_by_tenure[category][tenure]}}</td>
                                     {% endfor %}
+                                    <td>{{staff_by_category_by_tenure[category]['Total']}}</td>
                                 </tr>
                                 {% endfor %}
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for tenure in tenure_order %}
+                                    <td>{{staff_by_category_by_tenure.values() | sum(attribute=tenure)}}</td>
+                                    {% endfor %}
+                                    <td>{{staff_by_category_by_tenure.values() | sum(attribute='Total')}}</td>
+                                </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
                         </div>
@@ -775,6 +804,7 @@ a.header-block:hover {
                                     <th scope="col">In-School Suspension</th>
                                     <th scope="col">Out-of-School Suspension</th>
                                     <th scope="col">Referral to Law Enforcement</th>
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 <tr>
@@ -782,12 +812,24 @@ a.header-block:hover {
                                     <td>{{discipline_by_type_by_sex['iss']['F']}}</td>
                                     <td>{{discipline_by_type_by_sex['oss']['F']}}</td>
                                     <td>{{discipline_by_type_by_sex['referral']['F']}}</td>
+                                    <td>{{discipline_by_type_by_sex.values() | sum(attribute='F')}}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Male</th>
                                     <td>{{discipline_by_type_by_sex['iss']['M']}}</td>
                                     <td>{{discipline_by_type_by_sex['oss']['M']}}</td>
                                     <td>{{discipline_by_type_by_sex['referral']['M']}}</td>
+                                    <td>{{discipline_by_type_by_sex.values() | sum(attribute='M')}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% set iss_total = discipline_by_type_by_sex['iss'].values() | sum %}
+                                    {% set oss_total = discipline_by_type_by_sex['oss'].values() | sum %}
+                                    {% set referral_total = discipline_by_type_by_sex['referral'].values() | sum %}
+                                    <td>{{iss_total}}</td>
+                                    <td>{{oss_total}}</td>
+                                    <td>{{referral_total}}</td>
+                                    <td>{{iss_total + oss_total + referral_total}}</td>
                                 </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
@@ -807,6 +849,7 @@ a.header-block:hover {
                                     <th scope="col">In-School Suspension</th>
                                     <th scope="col">Out-of-School Suspension</th>
                                     <th scope="col">Referral to Law Enforcement</th>
+                                    <th scope="col">Total</th>
                                 </tr>
 
                                 {% for race in race_order %}
@@ -815,6 +858,7 @@ a.header-block:hover {
                                     <td>{{discipline_by_type_by_race['iss'][race]}}</td>
                                     <td>{{discipline_by_type_by_race['oss'][race]}}</td>
                                     <td>{{discipline_by_type_by_race['referral'][race]}}</td>
+                                    <td>{{discipline_by_type_by_race.values() | sum(attribute=race)}}</td>
                                 </tr>
                                 {% endfor %}
                             </table>

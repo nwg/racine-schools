@@ -4,6 +4,7 @@ from app import db
 from app.db import conn, cur
 from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
+from itertools import repeat
 
 MOST_RECENT_STAFF_YEAR = 2018
 MOST_RECENT_PSS_YEAR = 2017
@@ -31,6 +32,15 @@ EDUCATION_MAP = {
     None: 'unreported',
 }
 
+STAFF_EDUCATION_LEVELS = [
+    'associate',
+    'bachelors',
+    'masters',
+    'six_year_specialists',
+    'doctorate',
+    'other'
+]
+
 STAFF_CATEGORIES = (
     'Teachers',
     'Administrators',
@@ -40,6 +50,16 @@ STAFF_CATEGORIES = (
 )
 
 GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
+
+def convert_grade(grade):
+    return int(grade) if grade.isdigit() else grade
+
+def get_grades(low_grade, high_grade):
+    start_idx = GRADES_ORDER.index(low_grade)
+    end_idx = GRADES_ORDER.index(high_grade)
+
+    grades = GRADES_ORDER[start_idx:end_idx+1]
+    return [ convert_grade(grade) for grade in grades ]
 
 def pssdict(**extra):
     d = {
@@ -75,7 +95,7 @@ def render_school_summary_with_name(name):
     else:
         missing['summary']['pss_info'] = pssdict()
 
-    t, m = student_tables(school['is_private'], nces_id, ppin)
+    t, m = student_tables(school)
     tables['student'] = t
     missing['student'] = m
 
@@ -131,7 +151,14 @@ def discipline_tables(nces_id):
     return tables, missing
 
 
-def student_tables(is_private, nces_id, ppin):
+def student_tables(school):
+    is_private = school['is_private']
+    nces_id = school['nces_id']
+    ppin = school['pss_ppin']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
+    grades = get_grades(low_grade, high_grade)
+
     tables = {}
     missing = {}
 
@@ -153,20 +180,20 @@ def student_tables(is_private, nces_id, ppin):
 
     if nces_id == None:
         if not is_private:
-            missing['enrollment_grade_sex_data'] = ncesdict()
+            missing['enrollment_by_sex_by_grade'] = ncesdict()
             missing['enrollment_by_grade_by_race'] = ncesdict()
     else:
-        enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, nces_id)
-        if enrollment_grade_sex_data == None:
-            missing['enrollment_grade_sex_data'] = ncesdict()
+        enrollment_by_sex_by_grade = get_enrollment_by_sex_by_grade(cur, MOST_RECENT_NCES_YEAR, school)
+        if enrollment_by_sex_by_grade == None:
+            missing['enrollment_by_sex_by_grade'] = ncesdict()
         else:
-            tables['enrollment_grade_sex_data'] = ncesdict(table=enrollment_grade_sex_data)
+            tables['enrollment_by_sex_by_grade'] = ncesdict(table=enrollment_by_sex_by_grade, grades=grades)
 
-        enrollment_by_grade_by_race = get_enrollment_by_grade_by_race(cur, MOST_RECENT_NCES_YEAR, nces_id)
+        enrollment_by_grade_by_race = get_enrollment_by_grade_by_race(cur, MOST_RECENT_NCES_YEAR, school)
         if enrollment_by_grade_by_race == None:
             missing['enrollment_by_grade_by_race'] = ncesdict()
         else:
-            tables['enrollment_by_grade_by_race'] = ncesdict(table=enrollment_by_grade_by_race)
+            tables['enrollment_by_grade_by_race'] = ncesdict(table=enrollment_by_grade_by_race, grades=grades)
 
     return tables, missing
 
@@ -245,8 +272,11 @@ def get_pss_enrollment_by_demographic(cur, year, ppin):
 
     return cur.fetchone()
 
+def get_enrollment_by_sex_by_grade(cur, year, school):
+    nces_id = school['nces_id']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
 
-def get_enrollment_grade_sex_data(cur, year, nces_id):
     check_where = andd([
         idequals('year', year),
         idequals('nces_id', nces_id)
@@ -270,23 +300,30 @@ def get_enrollment_grade_sex_data(cur, year, nces_id):
 
         return query
 
-    cur.execute(query_sex_enrollment_counts())
-
-    grades = set()
+    grades = get_grades(low_grade, high_grade)
     enrollment_by_sex_by_grade = {}
+    for sex in 'M', 'F':
+        d = {}
+        for grade in grades:
+            d[grade] = 0
+        d['total'] = 0
+        enrollment_by_sex_by_grade[sex] = d
+
+    cur.execute(query_sex_enrollment_counts())
     for grade, sex, total in cur.fetchall():
-        grades.add(grade)
-        by_grade = enrollment_by_sex_by_grade.get(sex, {})
+        grade = convert_grade(grade)
+        by_grade = enrollment_by_sex_by_grade[sex]
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
         enrollment_by_sex_by_grade[sex] = by_grade
 
-    return {
-        'enrollment_by_sex_by_grade': enrollment_by_sex_by_grade,
-        'grades': sorted(grades, key=lambda x: GRADES_ORDER.index(x))
-    }
+    return enrollment_by_sex_by_grade
 
-def get_enrollment_by_grade_by_race(cur, year, nces_id):
+def get_enrollment_by_grade_by_race(cur, year, school):
+    nces_id = school['nces_id']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
+
     check_where = andd([
         idequals('year', year),
         idequals('nces_id', nces_id)
@@ -315,18 +352,25 @@ def get_enrollment_by_grade_by_race(cur, year, nces_id):
 
         return query
 
-    cur.execute(query_race_enrollment_counts())
     enrollment_by_grade_by_race = {}
+    grades = get_grades(low_grade, high_grade)
+    for grade in grades:
+        enrollment_by_grade_by_race[grade] = zip(RACE_COLS, repeat(0), repeat(0.0))
+
+    cur.execute(query_race_enrollment_counts())
     for row in cur.fetchall():
-        grade = row[0]
+        grade = convert_grade(row[0])
         races = row[1:]
-        if races[-1] > 0:
-            race_percent = [ count / float(races[-1]) * 100 for count in races ]
-        else:
-            assert all(count == 0 for count in races), races
-            race_percent = [ 0.0 ] * len(races)
         assert len(races) == len(RACE_COLS)
-        race_dict = dict(zip(RACE_COLS, zip(races, race_percent)))
+        if races[-1] == 0: # total
+            assert all(count == 0 for count in races), races
+            continue
+
+        race_percent = [ count / float(races[-1]) * 100 for count in races ]
+        race_dict = {}
+        for race, count, percent in zip(RACE_COLS, races, race_percent):
+            race_dict[race] = { 'count': count, 'percent': percent }
+
         enrollment_by_grade_by_race[grade] = race_dict
 
     return enrollment_by_grade_by_race
@@ -368,6 +412,7 @@ def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
             if category not in by_category:
                 by_category[category] = 0
             by_category['Total'] = by_category.get('Total', 0) + by_category[category]
+            staff_by_sex_by_category[sex] = by_category
     return staff_by_sex_by_category
 
 def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id):
@@ -400,8 +445,15 @@ def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id)
         by_education[EDUCATION_MAP[education_level]] = count
         staff_by_category_by_education[category] = by_education
 
-    if not staff_by_category_by_education:
-        return None
+
+    for category in STAFF_CATEGORIES:
+        for education in STAFF_EDUCATION_LEVELS:
+            by_education = staff_by_category_by_education.get(category, {})
+            if education not in by_education:
+                by_education[education] = 0
+            by_education['Total'] = by_education.get('Total', 0) + by_education[education]
+            staff_by_category_by_education[category] = by_education
+
 
     return staff_by_category_by_education
 
@@ -445,12 +497,22 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
         (q_5_plus, '5_plus'),
     )
 
+    tenure_keys = [ item[1] for item in tenure_items ]
+
     staff_by_category_by_tenure = {}
     for query, key in tenure_items:
         cur.execute(query)
         for category, count in cur.fetchall():
             by_tenure = staff_by_category_by_tenure.get(category, {})
             by_tenure[key] = count
+            staff_by_category_by_tenure[category] = by_tenure
+
+    for tenure in tenure_keys:
+        for category in STAFF_CATEGORIES:
+            by_tenure = staff_by_category_by_tenure.get(category, {})
+            if tenure not in by_tenure:
+                by_tenure[tenure] = 0
+            by_tenure['Total'] = by_tenure.get('Total', 0) + by_tenure[tenure]
             staff_by_category_by_tenure[category] = by_tenure
 
     return staff_by_category_by_tenure
@@ -487,7 +549,7 @@ def get_discipline_by_type_by_sex(cur, year, nces_id):
         table = sql.Identifier('discipline_counts')
         orr_categories = orr(idequals('category', category) for category in categories)
 
-        statement = sql.SQL("""select sex, sum(total::integer) as total from {} where {} group by sex""").format(
+        statement = sql.SQL("""select sex, sum(total::integer) as count from {} where {} group by sex""").format(
             table,
             andd([
                 idequals('nces_id', nces_id),
