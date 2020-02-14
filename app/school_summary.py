@@ -377,6 +377,7 @@ def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
             if category not in by_category:
                 by_category[category] = 0
             by_category['Total'] = by_category.get('Total', 0) + by_category[category]
+            staff_by_sex_by_category[sex] = by_category
     return staff_by_sex_by_category
 
 def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id):
@@ -416,6 +417,7 @@ def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id)
             if education not in by_education:
                 by_education[education] = 0
             by_education['Total'] = by_education.get('Total', 0) + by_education[education]
+            staff_by_category_by_education[category] = by_education
 
 
     return staff_by_category_by_education
