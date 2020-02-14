@@ -84,7 +84,7 @@ def render_school_summary_with_name(name):
     else:
         missing['summary']['pss_info'] = pssdict()
 
-    t, m = student_tables(school['is_private'], nces_id, ppin)
+    t, m = student_tables(school)
     tables['student'] = t
     missing['student'] = m
 
@@ -140,7 +140,11 @@ def discipline_tables(nces_id):
     return tables, missing
 
 
-def student_tables(is_private, nces_id, ppin):
+def student_tables(school):
+    is_private = school['is_private']
+    nces_id = school['nces_id']
+    ppin = school['pss_ppin']
+
     tables = {}
     missing = {}
 
@@ -165,7 +169,7 @@ def student_tables(is_private, nces_id, ppin):
             missing['enrollment_grade_sex_data'] = ncesdict()
             missing['enrollment_by_grade_by_race'] = ncesdict()
     else:
-        enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, nces_id)
+        enrollment_grade_sex_data = get_enrollment_grade_sex_data(cur, MOST_RECENT_NCES_YEAR, school)
         if enrollment_grade_sex_data == None:
             missing['enrollment_grade_sex_data'] = ncesdict()
         else:
@@ -254,8 +258,19 @@ def get_pss_enrollment_by_demographic(cur, year, ppin):
 
     return cur.fetchone()
 
+def get_grades(low_grade, high_grade):
+    start_idx = GRADES_ORDER.index(low_grade)
+    end_idx = GRADES_ORDER.index(high_grade)
 
-def get_enrollment_grade_sex_data(cur, year, nces_id):
+    grades = GRADES_ORDER[start_idx:end_idx+1]
+    return [ int(grade) if grade.isdigit() else grade for grade in grades ]
+
+
+def get_enrollment_grade_sex_data(cur, year, school):
+    nces_id = school['nces_id']
+    low_grade = school['low_grade']
+    high_grade = school['high_grade']
+
     check_where = andd([
         idequals('year', year),
         idequals('nces_id', nces_id)
@@ -281,26 +296,24 @@ def get_enrollment_grade_sex_data(cur, year, nces_id):
 
     cur.execute(query_sex_enrollment_counts())
 
-    grades = set()
+    grades = get_grades(low_grade, high_grade)
     enrollment_by_sex_by_grade = {}
-    for grade, sex, total in cur.fetchall():
-        if grade.isdigit():
-            grade = int(grade)
+    for sex in 'M', 'F':
+        d = {}
+        for grade in grades:
+            d[grade] = 0
+        d['total'] = 0
+        enrollment_by_sex_by_grade[sex] = d
 
-        grades.add(grade)
-        by_grade = enrollment_by_sex_by_grade.get(sex, {})
+    for grade, sex, total in cur.fetchall():
+        by_grade = enrollment_by_sex_by_grade[sex]
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
         enrollment_by_sex_by_grade[sex] = by_grade
 
-    def gradekey(g):
-        if type(g) == int:
-            g = f'{g:02d}'
-        return GRADES_ORDER.index(g)
-
     return {
         'enrollment_by_sex_by_grade': enrollment_by_sex_by_grade,
-        'grades': sorted(grades, key=gradekey)
+        'grades': grades
     }
 
 def get_enrollment_by_grade_by_race(cur, year, nces_id):
