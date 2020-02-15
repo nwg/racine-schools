@@ -251,7 +251,11 @@ def staff_tables(state_lea_id, state_school_id):
     else:
         missing['staff_by_category_by_education'] = dpidict()
 
-    tables['staff_by_category_by_tenure'] = dpidict(table=get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id))
+    staff_by_category_by_tenure = get_staff_by_category_by_tenure(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    if staff_by_category_by_tenure != None:
+        tables['staff_by_category_by_tenure'] = dpidict(table=staff_by_category_by_tenure)
+    else:
+        missing['staff_by_category_by_tenure'] = dpidict()
 
     return tables, missing
 
@@ -492,7 +496,17 @@ def format_rec(sq, *format):
         return sq.format(*format)
 
 
-def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
+def get_staff_by_category_by_tenure(cur, to_year, state_lea_id, state_school_id):
+    check_where = andd([
+        idequals('year', to_year),
+        idequals('state_lea_id', state_lea_id),
+        idequals('state_school_id', state_school_id)
+    ])
+    query = select('appointments', '*', where=check_where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
     def query_staff_tenure_counts(year_constraints):
         table = sql.Identifier('appointments')
 
