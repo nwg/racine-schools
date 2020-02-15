@@ -252,7 +252,7 @@ def staff_tables(state_lea_id, state_school_id):
     else:
         missing['staff_by_category_by_education'] = dpidict()
 
-    staff_by_category_by_tenure = get_staff_by_category_by_tenure(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    staff_by_category_by_tenure = get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id)
     if staff_by_category_by_tenure != None:
         tables['staff_by_category_by_tenure'] = dpidict(table=staff_by_category_by_tenure)
     else:
@@ -509,7 +509,8 @@ def format_rec(sq, *format):
         return sq.format(*format)
 
 
-def get_staff_by_category_by_tenure(cur, to_year, state_lea_id, state_school_id):
+def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
+    to_year = MOST_RECENT_STAFF_YEAR
     check_where = andd([
         idequals('year', to_year),
         idequals('state_lea_id', state_lea_id),
@@ -527,11 +528,25 @@ def get_staff_by_category_by_tenure(cur, to_year, state_lea_id, state_school_id)
             idequals('state_lea_id', state_lea_id),
             idequals('state_school_id', state_school_id),
         ])
-        where2 = format_rec(year_constraints, sql.Identifier('s3', 'count_year'))
+        where2 = format_rec(year_constraints, sql.Identifier('s3', 'num_years'))
 
         query = sql.SQL(
-            """select position_category, count(count_year) from (select first_name, last_name, position_category, count(year) as count_year from (select * from (select first_name, last_name, position_category, year, sum(fte) as sum_fte from {} where {} group by first_name, last_name, position_category, year) as s1 where s1.sum_fte > 0.0) as s2  group by first_name, last_name, position_category order by first_name,last_name) as s3 where {} group by position_category"""
-        ).format(table, where1, where2)
+            """
+            select s3.position_category, count(s3.num_years) from (
+                select s2.first_name, s2.last_name, s2.position_category, count(s2.year) as num_years from (
+                    select distinct first_name, last_name, a1.position_category, s1.year from appointments_distinct_ranked_most_recent a1
+                    join (
+                        select distinct first_name, last_name, year from appointments
+                    ) s1
+                    using (first_name, last_name)
+                    where {}
+                    order by first_name, last_name
+                ) s2
+                group by s2.first_name, s2.last_name, s2.position_category
+            ) s3 where {} group by s3.position_category;
+
+            """
+        ).format(where1, where2)
 
         return query
 
