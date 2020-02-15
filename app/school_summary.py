@@ -38,7 +38,8 @@ STAFF_EDUCATION_LEVELS = [
     'masters',
     'six_year_specialists',
     'doctorate',
-    'other'
+    'other',
+    'unreported'
 ]
 
 STAFF_CATEGORIES = (
@@ -245,7 +246,7 @@ def staff_tables(state_lea_id, state_school_id):
     else:
         tables['staff_by_sex_by_category'] = dpidict(table=staff_by_sex_by_category)
 
-    staff_by_category_by_education = get_staff_by_category_by_education(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    staff_by_category_by_education = get_staff_by_category_by_education(cur, state_lea_id, state_school_id)
     if staff_by_category_by_education != None:
         tables['staff_by_category_by_education'] = dpidict(table=staff_by_category_by_education)
     else:
@@ -452,19 +453,20 @@ def get_staff_by_sex_by_category(cur, state_lea_id, state_school_id):
             staff_by_sex_by_category[sex] = by_category
     return staff_by_sex_by_category
 
-def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id):
+def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
+    year = MOST_RECENT_STAFF_YEAR
     check_where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
         idequals('state_school_id', state_school_id)
     ])
 
-    query = select('appointments', '*', where=check_where)
+    query = select('appointments_distinct_ranked_most_recent', '*', where=check_where)
     cur.execute(query)
     if not cur.fetchone():
         return None
 
-    table = sql.Identifier('appointments')
+    table = sql.Identifier('appointments_distinct_ranked_most_recent')
 
     where = andd([
         idequals('year', year),
@@ -472,7 +474,12 @@ def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id)
         idequals('state_school_id', state_school_id),
     ])
     query = sql.SQL(
-        """select position_category, education_level, COALESCE(sum(fte), 0) from {} where {} and position_category is not null group by position_category, education_level"""
+        """
+        select position_category, education_level, count(id)
+        from {}
+        where {}
+        group by position_category, education_level;
+        """
     ).format(table, where)
 
     cur.execute(query)

@@ -8,6 +8,7 @@
     ('six_year_specialists', "6-Year Specialist's Degree"),
     ('doctorate', "Doctorate"),
     ('other', "Other"),
+    ('unreported', "Unreported")
 ]) %}
 {% set race_map = dict([
     ('black', "Black"),
@@ -27,7 +28,7 @@
     ('pss', "NCES Private School Universe Survey"),
 ]) %}
 
-{% set degree_order = ['associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other'] %}
+{% set degree_order = ['associate', 'bachelors', 'masters', 'six_year_specialists', 'doctorate', 'other', 'unreported'] %}
 {% set tenure_pairs = [
     ('1_2', "1-2 Years"),
     ('3_4', "3-4 Years"),
@@ -711,7 +712,7 @@ a.header-block:hover {
                                 <tr>
                                     <th scope="row">{{category}}</th>
                                     {% for degree in cols %}
-                                    <td>{{'%.1f' | format(staff_by_category_by_education[category].get(degree, 0.0))}}</td>
+                                    <td>{{staff_by_category_by_education[category].get(degree, 0)}}</td>
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}
@@ -719,7 +720,7 @@ a.header-block:hover {
                                 <tr>
                                     <th scope="row">Total</th>
                                     {% for degree in cols %}
-                                    <td>{{ '%.1f' | format(staff_by_category_by_education.values() | sum(attribute=degree)) }}</td>
+                                    <td>{{staff_by_category_by_education.values() | sum(attribute=degree)}}</td>
                                     {% endfor %}
                                 </tr>
                             </table>
