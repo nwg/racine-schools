@@ -11,6 +11,18 @@ insert into education_levels values
     (7, $$Doctorate$$),
     (8, $$Other$$);
 
+create table position_category_rank (
+    rank integer,
+    position_category text primary key
+);
+
+insert into position_category_rank values
+    (1, $$Other$$),
+    (2, $$Pupil Services$$),
+    (3, $$Aides / Paraprofessionals$$),
+    (4, $$Teachers$$),
+    (5, $$Administrators$$);
+
 create table schools (
     id serial primary key,
     state_lea_id text,
@@ -53,10 +65,22 @@ create table if not exists appointments (
     state_lea_id text not null,
     state_school_id text not null,
     position_code integer,
-    position_category text,
+    position_category text not null,
     gender text check (gender in ('M', 'F')),
     education_level integer references education_levels (level),
     fte real
+);
+
+create table appointments_distinct_ranked_most_recent (
+    id serial primary key,
+    year integer not null,
+    state_lea_id text not null,
+    state_school_id text not null,
+    first_name text,
+    last_name text,
+    position_category text,
+    gender text check (gender in ('M', 'F')),
+    education_level integer references education_levels (level)
 );
 
 create table appointments_imported (

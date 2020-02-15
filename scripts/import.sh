@@ -12,4 +12,5 @@ export PYTHONPATH=..:../util
 ./import_assignments_newstyle.py 2016 data/downloaded/all-staff-2016-2017.csv
 ./import_assignments_newstyle.py 2017 data/downloaded/all-staff-2017-2018.csv
 ./import_assignments_newstyle.py 2018 data/downloaded/all-staff-2018-2019.csv
+./finalize_assignments.py 2018
 ./import_discipline.py 2015 data/discipline_rusd_2015.csv

@@ -33,7 +33,7 @@ category_map = {
     17: 'Administrators',
     18: 'Teachers',
     19: 'Teachers',
-    43: None,
+    43: 'Other',
     50: 'Pupil Services',
     51: 'Administrators',
     52: 'Administrators',

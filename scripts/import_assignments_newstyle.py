@@ -65,7 +65,7 @@ def appointments():
             d['first_name'] = row['First Name'].strip()
             d['last_name'] = row['Last Name'].strip()
 
-            d['position_category'] = get_csv_str(row['Position Classification'])
+            d['position_category'] = get_csv_str(row['Position Classification']) or 'Other'
             d['gender'] = row['Gender'].strip()
 
             staff_category, _ = get_hyphen_dual(row['Assignment Staff Category'])

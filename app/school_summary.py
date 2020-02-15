@@ -239,7 +239,7 @@ def staff_tables(state_lea_id, state_school_id):
 
         return tables, missing
 
-    staff_by_sex_by_category = get_staff_by_sex_by_category(cur, MOST_RECENT_STAFF_YEAR, state_lea_id, state_school_id)
+    staff_by_sex_by_category = get_staff_by_sex_by_category(cur, state_lea_id, state_school_id)
     if staff_by_sex_by_category == None:
         missing['staff_by_sex_by_category'] = dpidict()
     else:
@@ -406,19 +406,20 @@ def get_enrollment_by_grade_by_race(cur, year, school):
 
     return enrollment_by_grade_by_race
 
-def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
+def get_staff_by_sex_by_category(cur, state_lea_id, state_school_id):
+    year = MOST_RECENT_STAFF_YEAR
     check_where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
         idequals('state_school_id', state_school_id)
     ])
 
-    query = select('appointments', '*', where=check_where)
+    query = select('appointments_distinct_ranked_most_recent', '*', where=check_where)
     cur.execute(query)
     if not cur.fetchone():
         return None
 
-    table = sql.Identifier('appointments')
+    table = sql.Identifier('appointments_distinct_ranked_most_recent')
     where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
@@ -426,7 +427,12 @@ def get_staff_by_sex_by_category(cur, year, state_lea_id, state_school_id):
     ])
 
     query = sql.SQL(
-        """select COALESCE(position_category, 'Other') as category, gender, count(gender) from {} where {} group by category, gender"""
+        """
+        select position_category, gender, count(id)
+        from {}
+        where {}
+        group by position_category, gender;
+        """
     ).format(table, where)
 
     cur.execute(query)
