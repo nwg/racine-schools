@@ -39,7 +39,7 @@
 {% set id_longname_map = dict([
     ('pss_enrollment_by_grade', 'Enrollment By Grade'),
     ('pss_enrollment_by_demographic', 'Enrollment by Race and Gender'),
-    ('enrollment_by_grade_by_sex', 'Enrollment by Grade and Gender'),
+    ('enrollment_by_sex_by_grade', 'Enrollment by Grade and Gender'),
     ('enrollment_by_grade_by_race', 'Enrollment by Grade and Race'),
     ('discipline_by_type_by_sex', 'Discipline by Type by Sex'),
     ('discipline_by_type_by_race', 'Discipline by Type by Race'),
@@ -459,7 +459,7 @@ a.header-block:hover {
                     <div id="student-demo-tables" class="section-table-list">
                         {% if missing.student %}
                         <table class="missing-data">
-                            <caption>Ø Missing Student Data</caption>
+                            <caption>No Student Data Available for this School</caption>
                             <tr>
                                 <th scope="col">Table</th>
                                 <th scope="col">Source</th>
@@ -468,7 +468,7 @@ a.header-block:hover {
                             {% for id, data in missing.student.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
+                                <td>{{source_map[data.source]}}</td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
@@ -646,7 +646,7 @@ a.header-block:hover {
                     <div id="staff-demo-tables" class="section-table-list">
                         {% if missing.staff %}
                         <table class="missing-data">
-                            <caption>Ø Missing Staff Data</caption>
+                            <caption>No Staff Data Available for this School</caption>
                             <tr>
                                 <th scope="col">Table</th>
                                 <th scope="col">Source</th>
@@ -655,7 +655,7 @@ a.header-block:hover {
                             {% for id, data in missing.staff.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
+                                <td>{{source_map[data.source]}}</td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
@@ -776,7 +776,7 @@ a.header-block:hover {
                     <div id="discipline-tables" class="section-table-list">
                         {% if missing.discipline %}
                         <table class="missing-data">
-                            <caption>Ø Missing Discipline Data</caption>
+                            <caption>No Discipline Data Available for this School</caption>
                             <tr>
                                 <th scope="col">Table</th>
                                 <th scope="col">Source</th>
@@ -785,7 +785,7 @@ a.header-block:hover {
                             {% for id, data in missing.discipline.items() %}
                             <tr>
                                 <td>{{id_longname_map[id]}}</td>
-                                <td><a class="standard-link" href="{{data.url}}">{{source_map[data.source]}}</a></td>
+                                <td>{{source_map[data.source]}}</td>
                                 <td>{{data.year}}</td>
                             </tr>
                             {% endfor %}
