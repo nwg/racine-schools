@@ -58,7 +58,8 @@ NCES_GRADE_MAP = dict([
 ])
 
 PSS_GRADE_MAP = dict([
-    ('KG', 'K5')
+    ('KG', 'K5'),
+    ('PK', 'K4')
 ])
 
 def convert_grade(grade):
