@@ -682,7 +682,7 @@ a.header-block:hover {
                                     <th scope="row">{{category}}</th>
                                     <td>{{staff_by_sex_by_category['F'][category]}}</td>
                                     <td>{{staff_by_sex_by_category['M'][category]}}</td>
-                                    <td>{{staff_by_sex_by_category['M'][category] + staff_by_sex_by_category['M'][category]}}</td>
+                                    <td>{{staff_by_sex_by_category['M'][category] + staff_by_sex_by_category['F'][category]}}</td>
                                 {% endfor %}
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
