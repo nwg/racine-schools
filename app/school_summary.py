@@ -340,6 +340,7 @@ def get_enrollment_by_sex_by_grade(cur, year, school):
     cur.execute(query_sex_enrollment_counts())
     for grade, sex, total in cur.fetchall():
         grade = convert_nces_grade(grade)
+        assert grade in grades, f'Grade {grade} not in valid grades for school ({grades})'
         by_grade = enrollment_by_sex_by_grade[sex]
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
