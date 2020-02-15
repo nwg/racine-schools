@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% set race_order = ['white', 'black', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races', 'total'] %}
-{% set grade_order = ['PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
     ('associate', "Associate Degree"),
@@ -481,18 +480,19 @@ a.header-block:hover {
                         {% set year = data.year %}
                         {% set source = data.source %}
                         {% set url = data.url %}
+                        {% set grades = data.grades %}
                         <div class="data-table">
                             <table>
                                 <caption>Private School Enrollment by Grade ({{year}}-{{year+1}})</caption>
                                 <tr>
                                     <th scope="row">Grade</th>
-                                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                                    {% for grade in grades %}
                                     <th scope="col">{{grade}}</th>
                                     {% endfor %}
                                     <th scope="col">Total</th>
                                 </tr>
                                     <th scope="row">Enrollment</th>
-                                    {% for grade in grade_order if grade in pss_enrollment_by_grade %}
+                                    {% for grade in grades %}
                                     <td>{{pss_enrollment_by_grade[grade]}}</td>
                                     {% endfor %}
                                     <td>{{pss_enrollment_by_grade.values() | sum}}</td>
@@ -622,7 +622,7 @@ a.header-block:hover {
                                     {% if race != 'total' %}
                                     <td>{{d.count}} ({{'%.1f'|format(d.percent)}}%)</td>
                                     {% else %}
-                                    <td>{{d.count}}</td>
+                                    <td>{{d['count']}}</td>
                                     {% endif %}
                                     {% endfor %}
                                     <td>{{enrollment_by_grade_by_race.values() | sum(attribute="{}.count".format(race))}}</td>
@@ -711,7 +711,7 @@ a.header-block:hover {
                                 <tr>
                                     <th scope="row">{{category}}</th>
                                     {% for degree in cols %}
-                                    <td>{{staff_by_category_by_education[category].get(degree, 0.0)}}</td>
+                                    <td>{{'%.1f' | format(staff_by_category_by_education[category].get(degree, 0.0))}}</td>
                                     {% endfor %}
                                 </tr>
                                 {% endfor %}

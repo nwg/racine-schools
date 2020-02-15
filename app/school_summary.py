@@ -49,10 +49,31 @@ STAFF_CATEGORIES = (
     'Other',
 )
 
-GRADES_ORDER = ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
+GRADES_ORDER = ('K3', 'K4', 'K5', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')
+
+NCES_GRADE_MAP = dict([
+    ('PK', 'K4'),
+    ('KG', 'K5')
+])
+
+PSS_GRADE_MAP = dict([
+    ('KG', 'K5')
+])
 
 def convert_grade(grade):
     return int(grade) if grade.isdigit() else grade
+
+def convert_nces_grade(grade):
+    grade = convert_grade(grade)
+    if grade in NCES_GRADE_MAP:
+        return NCES_GRADE_MAP[grade]
+    return grade
+
+def convert_pss_grade(grade):
+    grade = convert_grade(grade)
+    if grade in PSS_GRADE_MAP:
+        return PSS_GRADE_MAP[grade]
+    return grade
 
 def get_grades(low_grade, high_grade):
     start_idx = GRADES_ORDER.index(low_grade)
@@ -111,7 +132,8 @@ def render_school_summary_with_name(name):
         'school.html',
         school=school,
         tables=tables,
-        missing=missing
+        missing=missing,
+        grade_order=GRADES_ORDER
     )
 
 DPI_STAFF_WEBSITE = "https://publicstaffreports.dpi.wi.gov/PubStaffReport/Public/PublicReport/AllStaffReport"
@@ -163,7 +185,7 @@ def student_tables(school):
     missing = {}
 
     if ppin:
-        tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin))
+        tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin), grades=grades)
         tables['pss_enrollment_by_demographic'] = pssdict(table=get_pss_enrollment_by_demographic(cur, MOST_RECENT_PSS_YEAR, ppin))
     elif is_private:
         missing['pss_enrollment_by_grade'] = pssdict()
@@ -259,7 +281,7 @@ def get_pss_enrollment_by_grade(cur, year, ppin):
     cur.execute(q)
     enrollment_by_grade = {}
     for row in cur.fetchall():
-        enrollment_by_grade[row['grade']] = row['enrollment']
+        enrollment_by_grade[convert_pss_grade(row['grade'])] = row['enrollment']
 
     return enrollment_by_grade
 
@@ -311,7 +333,7 @@ def get_enrollment_by_sex_by_grade(cur, year, school):
 
     cur.execute(query_sex_enrollment_counts())
     for grade, sex, total in cur.fetchall():
-        grade = convert_grade(grade)
+        grade = convert_nces_grade(grade)
         by_grade = enrollment_by_sex_by_grade[sex]
         by_grade[grade] = total
         by_grade['total'] = by_grade.get('total', 0) + total
@@ -355,11 +377,16 @@ def get_enrollment_by_grade_by_race(cur, year, school):
     enrollment_by_grade_by_race = {}
     grades = get_grades(low_grade, high_grade)
     for grade in grades:
-        enrollment_by_grade_by_race[grade] = zip(RACE_COLS, repeat(0), repeat(0.0))
+        for race in RACE_COLS:
+            race_dict = {'count': 0, 'percent': 0.0}
+            by_race = enrollment_by_grade_by_race.get(grade, {})
+            by_race[race] = race_dict
+            enrollment_by_grade_by_race[grade] = by_race
 
     cur.execute(query_race_enrollment_counts())
     for row in cur.fetchall():
-        grade = convert_grade(row[0])
+        grade = convert_nces_grade(row[0])
+        assert grade in grades, f'Grade {grade} not in valid grades for school ({grades})'
         races = row[1:]
         assert len(races) == len(RACE_COLS)
         if races[-1] == 0: # total
@@ -435,7 +462,7 @@ def get_staff_by_category_by_education(cur, year, state_lea_id, state_school_id)
         idequals('state_school_id', state_school_id),
     ])
     query = sql.SQL(
-        """select position_category, education_level, COALESCE(sum(fte), 0) from {} where {} group by position_category, education_level"""
+        """select position_category, education_level, COALESCE(sum(fte), 0) from {} where {} and position_category is not null group by position_category, education_level"""
     ).format(table, where)
 
     cur.execute(query)
