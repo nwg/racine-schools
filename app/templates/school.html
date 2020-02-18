@@ -392,7 +392,9 @@ a.header-block:hover {
                     <a id="home-anchor" href="http://racineschools.com"><img width="165" height="105" id="home-image" src="https://racineschools.s3.amazonaws.com/static/racine-schools-logo.jpg" /></a>
                 </div>
             </div>
+            {% if school.log %}
             <img src="{{school.logo}}" />
+            {% endif %}
 
             <div id="summary">
 
