@@ -58,6 +58,8 @@ create table schools (
     choice_students_pct NUMERIC(5, 2),
     num_students integer,
     num_grade_levels integer,
+    is_old_siena boolean not null,
+    summary_year integer not null,
     UNIQUE (state_lea_id, state_school_id),
     UNIQUE (nces_lea_id, nces_school_id)
 );

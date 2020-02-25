@@ -4,6 +4,9 @@ import csv
 import psycopg2
 from psycopg_utils import insert_or_update
 
+CURRENT_SUMMARY_YEAR = 2018
+STAR_SUMMARY_YEAR = 2017
+
 conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
 cur = conn.cursor()
 
@@ -24,6 +27,11 @@ def strip_star(s):
     if s == None:
         return s
     return s.rstrip('*')
+
+def has_star(s):
+    if s == None:
+        return False
+    return s.find('*') != -1
 
 def format_grade(s):
     try:
@@ -82,6 +90,13 @@ def schools():
             d['curriculum_focus'] = row['Curriculum Focus'] or None
             d['num_students'] = strip_star(get_maybe(row['Num Students'])) or None
             d['choice_students_pct'] = strip_star(strip_star(get_maybe(row['Percent Choice Students']))) or None
+
+            starred_data = has_star(row['Economically Disadvantaged']) \
+                        or has_star(row['Num Students']) \
+                        or has_star(row['Percent Choice Students'])
+
+            d['summary_year'] = STAR_SUMMARY_YEAR if starred_data else CURRENT_SUMMARY_YEAR
+            d['is_old_siena'] = row['Affiliation'].find('Siena Schools') != -1
 
             yield d
 

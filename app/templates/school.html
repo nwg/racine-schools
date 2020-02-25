@@ -441,10 +441,14 @@ a.header-block:hover {
                     <span style="font-weight: bold;"><a class="standard-link" target="_none" href="{{school.report2}}">State Report Card (Choice Students Only)</a></span>
                     {% endif %}
 
+                    {% if school.is_old_siena %}
+                    <span style="margin-top: 1rem;">Note: a school-specific report card is not available after the 2017-2018 school year because this school’s results are now combined with all other <a class="standard-link" href="/s/Siena%20Catholic%20Schools%20of%20Racine">Siena Catholic Schools</a></span>
+                    {% endif %}
+
                 </div>
 
                 <div id="summary-info">
-                    <span class="underline bold">Summary Data (as of 2018-2019 School Year)</span> <br />
+                    <span class="underline bold">Summary Data (as of {{school.summary_year}}-{{school.summary_year+1}} School Year)</span> <br />
                     <div id="summary-info-data">
                         <span class="bold">Affiliation:&nbsp</span><span>{{school.affiliation}}</span> <br />
                         <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
