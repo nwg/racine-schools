@@ -401,10 +401,23 @@ a.header-block:hover {
                 <div style="padding-bottom: 0px; padding-top: 32px;">
                     <span style="font-size: 21.333pt;">{{school.longname}}</span>
                     <div class="small-summary" style="margin-top: 1em;">
+                        {% if school.address_comment %}
+                        <span class="underline">{{school.address_comment}}</span><br />
+                        {% endif %}
                         <span>{{school.address1}}</span><br />
                         <span>{{school.address2}}</span><br />
                         <span>{{school.phone}}</span><br />
                     </div>
+                    {% if school.second_address1 %}
+                    <div class="small-summary" style="margin-top: 1em;">
+                        {% if school.second_address_comment %}
+                        <span class="underline">{{school.second_address_comment}}</span><br />
+                        {% endif %}
+                        <span>{{school.second_address1}}</span><br />
+                        <span>{{school.second_address2}}</span><br />
+                        <span>{{school.second_phone}}</span><br />
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div id="website-info">

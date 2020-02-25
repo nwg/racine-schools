@@ -66,7 +66,12 @@ def schools():
             d['nces_id'] = row['NCES'] or None
             d['address1'] = row['Address1'] or None
             d['address2'] = row['Address2'] or None
+            d['address_comment'] = row['AddressGrades'] or None
             d['phone'] = row['Phone'] or None
+            d['second_address1'] = row['SecondAddress1'] or None
+            d['second_address2'] = row['SecondAddress2'] or None
+            d['second_address_comment'] = row['SecondAddressGrades'] or None
+            d['second_phone'] = row['SecondPhone'] or None
             d['website'] = row['Website'] or None
             d['mission'] = row['Mission'] or None
             d['report1'] = report_url(get_maybe(row['Report1'])) or None
