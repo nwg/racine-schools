@@ -44,7 +44,7 @@ from urllib.parse import urljoin
 LOGO_BASE = 'https://racineschools.s3.amazonaws.com/logos-scaled/'
 
 def logo_url(s):
-    if s == None: return None
+    if not s: return None
     return urljoin(LOGO_BASE, s)
 
 REPORT_BASE = 'https://racineschools.s3.amazonaws.com/report-cards/'
