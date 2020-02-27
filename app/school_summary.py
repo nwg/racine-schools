@@ -1,7 +1,7 @@
 from flask import render_template
 from app import app
 from app import db
-from app.db import conn, cur
+from app.db import make_cursor
 from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
 from itertools import repeat
@@ -94,7 +94,8 @@ def pssdict(**extra):
     return d
 
 def render_school_summary_with_name(name):
-    school = db.school_with_name(name)
+    cur = make_cursor()
+    school = db.school_with_name(cur, name)
     school = dict(school)
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
@@ -118,15 +119,15 @@ def render_school_summary_with_name(name):
     else:
         missing['summary']['pss_info'] = pssdict()
 
-    t, m = student_tables(school)
+    t, m = student_tables(cur, school)
     tables['student'] = t
     missing['student'] = m
 
-    t, m = staff_tables(state_lea_id, state_school_id)
+    t, m = staff_tables(cur, state_lea_id, state_school_id)
     tables['staff'] = t
     missing['staff'] = m
 
-    t, m = discipline_tables(nces_id)
+    t, m = discipline_tables(cur, nces_id)
     tables['discipline'] = t
     missing['discipline'] = m
 
@@ -143,7 +144,7 @@ PSS_SURVEY_WEBSITE = "https://nces.ed.gov/surveys/pss/pssdata.asp"
 NCES_SCHOOL_WEBSITE = "https://nces.ed.gov/ccd/pubschuniv.asp"
 OCR_WEBSITE = "https://ocrdata.ed.gov/"
 
-def discipline_tables(nces_id):
+def discipline_tables(cur, nces_id):
     tables = {}
     missing = {}
 
@@ -175,7 +176,7 @@ def discipline_tables(nces_id):
     return tables, missing
 
 
-def student_tables(school):
+def student_tables(cur, school):
     is_private = school['is_private']
     nces_id = school['nces_id']
     ppin = school['pss_ppin']
@@ -221,7 +222,7 @@ def student_tables(school):
 
     return tables, missing
 
-def staff_tables(state_lea_id, state_school_id):
+def staff_tables(cur, state_lea_id, state_school_id):
     tables = {}
     missing = {}
 
