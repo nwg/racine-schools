@@ -68,6 +68,10 @@ def schools():
 
             d['low_grade'] = format_grade(row['low grade'])
             d['high_grade'] = format_grade(row['high grade'])
+
+            assert 0 < len(d['low_grade']) <=2, f"""bad low grade {d['low_grade']} for school {d['longname']}"""
+            assert 0 < len(d['high_grade']) <=2, f"""bad high grade {d['high_grade']} for school {{d['longname']}}"""
+
             d['state_lea_id'] = row['District Code'] or None
             d['state_school_id'] = row['School Code'] or None
             d['pss_ppin'] = row['PPIN'] or None
