@@ -5,6 +5,7 @@ from app.db import make_cursor
 from psycopg_utils import select, idequals, andd, orr, on, colsequal
 from psycopg2 import sql
 from itertools import repeat
+import app.filters
 
 MOST_RECENT_STAFF_YEAR = 2018
 MOST_RECENT_PSS_YEAR = 2017

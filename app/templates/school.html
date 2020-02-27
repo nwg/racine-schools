@@ -1,4 +1,13 @@
 <!DOCTYPE html>
+
+{% macro grade_range(g1, g2) -%}
+{% if g1 != g2 %}
+{{g1|grade_format}}-{{g2|grade_format}}
+{% else %}
+{{g1|grade_format}}
+{% endif %}
+{%- endmacro %}
+
 {% set race_order = ['white', 'black', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races', 'total'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
@@ -452,7 +461,7 @@ a.header-block:hover {
                     <div id="summary-info-data">
                         <span class="bold">Affiliation:&nbsp</span><span>{{school.affiliation}}</span> <br />
                         <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
-                        <span class="bold">Grade Levels:&nbsp;</span><span>{{school.low_grade}}-{{school.high_grade}}</span> <br />
+                        <span class="bold">Grade Levels:&nbsp;</span><span>{{grade_range(school.low_grade, school.high_grade)}}</span> <br />
                         {% if school.disadvantaged_pct %}
                         <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
                         {% endif %}
