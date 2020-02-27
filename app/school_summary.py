@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, abort
 from app import app
 from app import db
 from app.db import make_cursor
@@ -97,6 +97,8 @@ def pssdict(**extra):
 def render_school_summary_with_name(name):
     cur = make_cursor()
     school = db.school_with_name(cur, name)
+    if not school:
+        abort(404)
     school = dict(school)
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
