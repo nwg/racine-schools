@@ -460,7 +460,7 @@ a.header-block:hover {
                     <span class="underline bold">Summary Data (as of {{school.summary_year}}-{{school.summary_year+1}} School Year)</span> <br />
                     <div id="summary-info-data">
                         <span class="bold">Affiliation:&nbsp</span><span>{{school.affiliation}}</span> <br />
-                        <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students}}</span> <br />
+                        <span class="bold">Total Students:&nbsp;</span><span>{{school.num_students or 'Not Available'}}</span> <br />
                         <span class="bold">Grade Levels:&nbsp;</span><span>{{grade_range(school.low_grade, school.high_grade)}}</span> <br />
                         {% if school.disadvantaged_pct %}
                         <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
