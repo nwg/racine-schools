@@ -467,7 +467,7 @@ a.header-block:hover {
                         {% endif %}
                         <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus}}</span> <br />
                         {% if school.choice_students_pct %}
-                        <span class="bold">Choice Students:&nbsp;</span><span>{{school.choice_students_pct}}%</span> <br />
+                        <span class="bold">Choice Students:&nbsp;</span><span>{{'%2.1f' % school.choice_students_pct}}%</span> <br />
                         {% endif %}
 
                     </div>
