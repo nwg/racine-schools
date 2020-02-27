@@ -11,7 +11,8 @@ def get_url():
     hash.update(data.read())
     return hash.digest()
 
-with ThreadPoolExecutor(max_workers=4) as executor:
-    threads = [ executor.submit(get_url) for i in range(4) ]
+COUNT=10
+with ThreadPoolExecutor(max_workers=COUNT) as executor:
+    threads = [ executor.submit(get_url) for i in range(COUNT) ]
     for thread in threads:
         print(thread.result())
