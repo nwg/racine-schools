@@ -7,9 +7,6 @@ from psycopg_utils import insert_or_update
 CURRENT_SUMMARY_YEAR = 2018
 STAR_SUMMARY_YEAR = 2017
 
-conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
-cur = conn.cursor()
-
 def get_bool(s):
     try:
         return bool(s)
@@ -52,14 +49,19 @@ def report_url(s):
     if s == None: return None
     return urljoin(REPORT_BASE, s)
 
-def schools():
-    with open('data/racine-schools-directory.csv', newline='') as csvfile:
+def get_schools():
+    schools = []
+    state_school_id_history = []
+    nces_id_history = []
+    with open('data/racine-schools-directory.csv', newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if not row['name']:
+            if not row['id']:
                 continue
 
             d = {}
+            school_id = int(row['id'])
+            d['id'] = school_id
             d['longname'] = row['name'].strip()
             d['is_elementary'] = get_bool(row['E'])
             d['is_middle'] = get_bool(row['M'])
@@ -102,8 +104,45 @@ def schools():
             d['summary_year'] = STAR_SUMMARY_YEAR if starred_data else CURRENT_SUMMARY_YEAR
             d['is_old_siena'] = row['Affiliation'].find('Siena Schools') != -1
 
-            yield d
+            schools.append(d)
 
-insert_or_update(cur, 'schools', ('longname',), schools())
 
-conn.commit()
+            def parse_values(values):
+                if not values:
+                    return None
+                items = values.split(',')
+                return [ item.split(':') for item in items ]
+
+            nces_pairs = parse_values(row['NCES History'])
+            if nces_pairs:
+                for pair in nces_pairs:
+                    end_year, nces_id = pair
+                    nces = {}
+                    nces['school_id'] = school_id
+                    nces['nces_id'] = nces_id
+                    nces['end_year'] = end_year
+                    nces_id_history.append(nces)
+
+            state_school_id_pairs = parse_values(row['School Code History'])
+            if state_school_id_pairs:
+                for pair in state_school_id_pairs:
+                    end_year, state_state_school_id = pair
+                    state_school_id = {}
+                    state_school_id['school_id'] = school_id
+                    state_school_id['state_school_id'] = state_state_school_id
+                    state_school_id['end_year'] = end_year
+                    state_school_id_history.append(state_school_id)
+
+    return schools, state_school_id_history, nces_id_history
+
+if __name__  == '__main__':
+    conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
+    cur = conn.cursor()
+
+    schools, state_school_id_history, nces_id_history = get_schools()
+
+    insert_or_update(cur, 'schools', ('longname',), schools)
+    insert_or_update(cur, 'state_school_id_history', ('school_id', 'state_school_id'), state_school_id_history)
+    insert_or_update(cur, 'nces_id_history', ('school_id', 'nces_id'), nces_id_history)
+
+    conn.commit()

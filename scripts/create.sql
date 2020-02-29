@@ -64,6 +64,20 @@ create table schools (
     UNIQUE (nces_lea_id, nces_school_id)
 );
 
+create table nces_id_history (
+    school_id integer references schools (id),
+    nces_id bigint unique,
+    end_year integer,
+    UNIQUE (school_id, nces_id)
+);
+
+create table state_school_id_history (
+    school_id integer references schools (id),
+    state_school_id text unique,
+    end_year integer,
+    UNIQUE (school_id, state_school_id)
+);
+
 create table if not exists appointments (
     id serial primary key,
     staff_id text,

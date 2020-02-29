@@ -126,11 +126,11 @@ def render_school_summary_with_name(name):
     tables['student'] = t
     missing['student'] = m
 
-    t, m = staff_tables(cur, state_lea_id, state_school_id)
+    t, m = staff_tables(cur, school)
     tables['staff'] = t
     missing['staff'] = m
 
-    t, m = discipline_tables(cur, nces_id)
+    t, m = discipline_tables(cur, school)
     tables['discipline'] = t
     missing['discipline'] = m
 
@@ -147,9 +147,10 @@ PSS_SURVEY_WEBSITE = "https://nces.ed.gov/surveys/pss/pssdata.asp"
 NCES_SCHOOL_WEBSITE = "https://nces.ed.gov/ccd/pubschuniv.asp"
 OCR_WEBSITE = "https://ocrdata.ed.gov/"
 
-def discipline_tables(cur, nces_id):
+def discipline_tables(cur, school):
     tables = {}
     missing = {}
+    nces_ids = get_all_nces_ids(cur, school, MOST_RECENT_OCR_YEAR)
 
     def ocrdict(**extra):
         ocr = {
@@ -160,17 +161,17 @@ def discipline_tables(cur, nces_id):
         ocr.update(extra)
         return ocr
 
-    if nces_id == None:
+    if nces_ids == None:
         missing['discipline_by_type_by_sex'] = ocrdict()
         missing['discipline_by_type_by_race'] = ocrdict()
     else:
-        discipline_by_type_by_sex = get_discipline_by_type_by_sex(cur, MOST_RECENT_OCR_YEAR, nces_id)
+        discipline_by_type_by_sex = get_discipline_by_type_by_sex(cur, MOST_RECENT_OCR_YEAR, school)
         if discipline_by_type_by_sex != None:
             tables['discipline_by_type_by_sex'] = ocrdict(table=discipline_by_type_by_sex)
         else:
             missing['discipline_by_type_by_sex'] = ocrdict()
 
-        discipline_by_type_by_race = get_discipline_by_type_by_race(cur, MOST_RECENT_OCR_YEAR, nces_id)
+        discipline_by_type_by_race = get_discipline_by_type_by_race(cur, MOST_RECENT_OCR_YEAR, school)
         if discipline_by_type_by_race != None:
             tables['discipline_by_type_by_race'] = ocrdict(table=discipline_by_type_by_race)
         else:
@@ -225,9 +226,11 @@ def student_tables(cur, school):
 
     return tables, missing
 
-def staff_tables(cur, state_lea_id, state_school_id):
+def staff_tables(cur, school):
     tables = {}
     missing = {}
+    state_lea_id = school['state_lea_id']
+    state_school_ids = get_all_state_school_ids(cur, school, MOST_RECENT_STAFF_YEAR)
 
     def dpidict(**extra):
         d = {
@@ -238,26 +241,26 @@ def staff_tables(cur, state_lea_id, state_school_id):
         d.update(extra)
         return d
 
-    if not state_lea_id or not state_school_id:
+    if not state_lea_id or not state_school_ids:
         missing['staff_by_sex_by_category'] = dpidict()
         missing['staff_by_category_by_education'] = dpidict()
         missing['staff_by_category_by_tenure'] = dpidict()
 
         return tables, missing
 
-    staff_by_sex_by_category = get_staff_by_sex_by_category(cur, state_lea_id, state_school_id)
+    staff_by_sex_by_category = get_staff_by_sex_by_category(cur, school)
     if staff_by_sex_by_category == None:
         missing['staff_by_sex_by_category'] = dpidict()
     else:
         tables['staff_by_sex_by_category'] = dpidict(table=staff_by_sex_by_category)
 
-    staff_by_category_by_education = get_staff_by_category_by_education(cur, state_lea_id, state_school_id)
+    staff_by_category_by_education = get_staff_by_category_by_education(cur, school)
     if staff_by_category_by_education != None:
         tables['staff_by_category_by_education'] = dpidict(table=staff_by_category_by_education)
     else:
         missing['staff_by_category_by_education'] = dpidict()
 
-    staff_by_category_by_tenure = get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id)
+    staff_by_category_by_tenure = get_staff_by_category_by_tenure(cur, school)
     if staff_by_category_by_tenure != None:
         tables['staff_by_category_by_tenure'] = dpidict(table=staff_by_category_by_tenure)
     else:
@@ -304,14 +307,41 @@ def get_pss_enrollment_by_demographic(cur, year, ppin):
 
     return cur.fetchone()
 
+def get_all_state_school_ids(cur, school, year):
+    history_where = andd([
+        idequals('school_id', school['id']),
+        sql.SQL('end_year >= {}').format(sql.Literal(year))
+    ])
+    q = select('state_school_id_history', (sql.Identifier('state_school_id'),), where=history_where)
+    #assert False, q.as_string(cur)
+    cur.execute(q)
+    additional_state_school_ids = [ row[0] for row in cur.fetchall() ]
+
+    state_school_ids = [ school['state_school_id'] ] + additional_state_school_ids
+    return state_school_ids
+
+def get_all_nces_ids(cur, school, year):
+    history_where = andd([
+        idequals('school_id', school['id']),
+        sql.SQL('end_year >= {}').format(sql.Literal(year))
+    ])
+    q = select('nces_id_history', (sql.Identifier('nces_id'),), where=history_where)
+    cur.execute(q)
+    additional_nces_ids = [ row[0] for row in cur.fetchall() ]
+
+    nces_ids = [ school['nces_id'] ] + additional_nces_ids
+    return nces_ids
+
 def get_enrollment_by_sex_by_grade(cur, year, school):
-    nces_id = school['nces_id']
     low_grade = school['low_grade']
     high_grade = school['high_grade']
+    
+    nces_ids = get_all_nces_ids(cur, school, year)
+    nces_where = orr([ idequals('nces_id', nces_id) for nces_id in nces_ids ])
 
     check_where = andd([
         idequals('year', year),
-        idequals('nces_id', nces_id)
+        nces_where
     ])
     query = select('nces_enrollment_counts', '*', where=check_where)
     cur.execute(query)
@@ -323,7 +353,7 @@ def get_enrollment_by_sex_by_grade(cur, year, school):
 
         where = andd([
             idequals('year', year),
-            idequals('nces_id', nces_id)
+            nces_where
         ])
 
         query = sql.SQL(
@@ -357,9 +387,12 @@ def get_enrollment_by_grade_by_race(cur, year, school):
     low_grade = school['low_grade']
     high_grade = school['high_grade']
 
+    nces_ids = get_all_nces_ids(cur, school, year)
+    nces_where = orr([ idequals('nces_id', nces_id) for nces_id in nces_ids ])
+
     check_where = andd([
         idequals('year', year),
-        idequals('nces_id', nces_id)
+        nces_where
     ])
     query = select('nces_enrollment_counts', '*', where=check_where)
     cur.execute(query)
@@ -371,7 +404,7 @@ def get_enrollment_by_grade_by_race(cur, year, school):
 
         where = andd([
             idequals('year', year),
-            idequals('nces_id', nces_id)
+            nces_where
         ])
 
         def sumcol(race):
@@ -413,12 +446,15 @@ def get_enrollment_by_grade_by_race(cur, year, school):
 
     return enrollment_by_grade_by_race
 
-def get_staff_by_sex_by_category(cur, state_lea_id, state_school_id):
+def get_staff_by_sex_by_category(cur, school):
     year = MOST_RECENT_STAFF_YEAR
+    state_lea_id = school['state_lea_id']
+    state_school_ids = get_all_state_school_ids(cur, school, year)
+    state_where = orr([ idequals('state_school_id', state_school_id) for state_school_id in state_school_ids ])
     check_where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
-        idequals('state_school_id', state_school_id)
+        state_where
     ])
 
     query = select('appointments_distinct_ranked_most_recent', '*', where=check_where)
@@ -430,7 +466,7 @@ def get_staff_by_sex_by_category(cur, state_lea_id, state_school_id):
     where = andd([
         idequals('year', year),
         idequals('state_lea_id', state_lea_id),
-        idequals('state_school_id', state_school_id),
+        state_where
     ])
 
     query = sql.SQL(
@@ -459,7 +495,9 @@ def get_staff_by_sex_by_category(cur, state_lea_id, state_school_id):
             staff_by_sex_by_category[sex] = by_category
     return staff_by_sex_by_category
 
-def get_staff_by_category_by_education(cur, state_lea_id, state_school_id):
+def get_staff_by_category_by_education(cur, school):
+    state_lea_id = school['state_lea_id']
+    state_school_id = school['state_school_id']
     year = MOST_RECENT_STAFF_YEAR
     check_where = andd([
         idequals('year', year),
@@ -515,7 +553,9 @@ def format_rec(sq, *format):
         return sq.format(*format)
 
 
-def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
+def get_staff_by_category_by_tenure(cur, school):
+    state_lea_id = school['state_lea_id']
+    state_school_id = school['state_school_id']
     to_year = MOST_RECENT_STAFF_YEAR
     check_where = andd([
         idequals('year', to_year),
@@ -527,14 +567,21 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
     if not cur.fetchone():
         return None
 
+    state_school_ids = get_all_state_school_ids(cur, school, 0)
+    all_ids_where = orr([ idequals('state_school_id', state_school_id) for state_school_id in state_school_ids ])
+
     def query_staff_tenure_counts(year_constraints):
         table = sql.Identifier('appointments')
 
         where1 = andd([
             idequals('state_lea_id', state_lea_id),
-            idequals('state_school_id', state_school_id),
+            all_ids_where
         ])
-        where2 = format_rec(year_constraints, sql.Identifier('s3', 'num_years'))
+        where2 = andd([
+            idequals('state_lea_id', state_lea_id),
+            idequals('state_school_id', school['state_school_id'])
+        ])
+        where3 = format_rec(year_constraints, sql.Identifier('s3', 'num_years'))
 
         query = sql.SQL(
             """
@@ -542,7 +589,7 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
                 select s2.first_name, s2.last_name, s2.position_category, count(s2.year) as num_years from (
                     select distinct first_name, last_name, a1.position_category, s1.year from appointments_distinct_ranked_most_recent a1
                     join (
-                        select distinct first_name, last_name, year from appointments
+                        select distinct first_name, last_name, year from appointments where {}
                     ) s1
                     using (first_name, last_name)
                     where {}
@@ -552,7 +599,7 @@ def get_staff_by_category_by_tenure(cur, state_lea_id, state_school_id):
             ) s3 where {} group by s3.position_category;
 
             """
-        ).format(where1, where2)
+        ).format(where1, where2, where3)
 
         return query
 
@@ -609,10 +656,13 @@ referral_categories = [
     'SWOD: Referral to law enforcement',
 ]
 
-def get_discipline_by_type_by_sex(cur, year, nces_id):
+def get_discipline_by_type_by_sex(cur, year, school):
+    nces_ids = get_all_nces_ids(cur, school, year)
+    nces_where = orr([ idequals('nces_id', nces_id) for nces_id in nces_ids ])
+
     check_where = andd([
-        idequals('nces_id', nces_id),
-        idequals('year', year)
+        idequals('year', year),
+        nces_where
     ])
     query = select('discipline_counts', '*', where=check_where)
     cur.execute(query)
@@ -627,7 +677,7 @@ def get_discipline_by_type_by_sex(cur, year, nces_id):
         statement = sql.SQL("""select sex, sum(total::integer) as count from {} where {} group by sex""").format(
             table,
             andd([
-                idequals('nces_id', nces_id),
+                nces_where,
                 idequals('year', year),
                 orr_categories]))
         return statement
@@ -649,9 +699,11 @@ def get_discipline_by_type_by_sex(cur, year, nces_id):
 
     return by_type_by_sex
 
-def get_discipline_by_type_by_race(cur, year, nces_id):
+def get_discipline_by_type_by_race(cur, year, school):
+    nces_ids = get_all_nces_ids(cur, school, year)
+    nces_where = orr([ idequals('nces_id', nces_id) for nces_id in nces_ids ])
     check_where = andd([
-        idequals('nces_id', nces_id),
+        nces_where,
         idequals('year', year)
     ])
     query = select('discipline_counts', '*', where=check_where)
@@ -673,7 +725,7 @@ def get_discipline_by_type_by_race(cur, year, nces_id):
             cols,
             table,
             andd([
-                idequals('nces_id', nces_id),
+                nces_where,
                 idequals('year', year),
                 orr_categories]))
         return statement
