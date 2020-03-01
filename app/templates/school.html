@@ -441,13 +441,13 @@ a.header-block:hover {
 
                 <div id="report-card-info">
                     {% if school.report1 %}
-                    <span style="font-weight: bold;"><a class="standard-link" target="_none" href="{{school.report1}}">{{ 'Report Card - All Students' if school.is_private else 'Report Card'}}</a></span>
+                    <span style="font-weight: bold;"><a class="standard-link" target="_blank" href="{{school.report1}}">{{ 'Report Card - All Students' if school.is_private else 'Report Card'}}</a></span>
                     {% elif not school.report2 %}
                     <span>No state report card is available for this school</span>
                     {% endif %}
 
                     {% if school.report2 %}
-                    <span style="font-weight: bold;"><a class="standard-link" target="_none" href="{{school.report2}}">Report Card - Choice Students Only</a></span>
+                    <span style="font-weight: bold;"><a class="standard-link" target="_blank" href="{{school.report2}}">Report Card - Choice Students Only</a></span>
                     {% endif %}
 
                     {% if school.is_old_siena %}
