@@ -465,7 +465,12 @@ a.header-block:hover {
                         {% if school.disadvantaged_pct %}
                         <span class="bold">Economically Disadvantaged:&nbsp;</span><span>{{'%2.1f%%'|format(school.disadvantaged_pct)}}</span> <br />
                         {% endif %}
-                        <span class="bold">Curriculum Focus:&nbsp;</span><span>{{school.curriculum_focus or 'Not Available'}}</span> <br />
+                        {% set focus_items = school.curriculum_focus_items %}
+                        {% if school.is_public_choice %}
+                        {% set focus_items = (focus_items + ['<a href="https://www.rusd.org/district/choice-schools">RUSD Choice school</a>']) %}
+                        {% endif %}
+                        <span class="bold">Curriculum Focus:&nbsp;</span>
+                        <span>{{focus_items|join(', ')|safe or 'Not Available'}}</span> <br />
                         {% if school.is_private %}
                         <span class="bold">Choice Students:&nbsp;</span><span>{{'%2.1f%%' % school.choice_students_pct if school.choice_students_pct else 'Not Available'}}</span> <br />
                         {% endif %}

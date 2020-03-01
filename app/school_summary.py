@@ -100,6 +100,7 @@ def render_school_summary_with_name(name):
     if not school:
         abort(404)
     school = dict(school)
+    school['curriculum_focus_items'] = [] if not school['curriculum_focus'] else school['curriculum_focus'].split(',')
     state_lea_id = school['state_lea_id']
     state_school_id = school['state_school_id']
     nces_id = school['nces_id']

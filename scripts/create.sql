@@ -36,6 +36,7 @@ create table schools (
     is_middle boolean not null,
     is_high boolean not null,
     is_private boolean not null,
+    is_public_choice boolean not null,
     low_grade character(2) check (low_grade in ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')),
     high_grade character(2) check (low_grade in ('PK', 'K3', 'K4', 'K5', 'KG', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13')),
     address1 text,

@@ -67,6 +67,7 @@ def get_schools():
             d['is_middle'] = get_bool(row['M'])
             d['is_high'] = get_bool(row['H'])
             d['is_private'] = get_bool(row['Private'])
+            d['is_public_choice'] = get_bool(row['Public Choice'])
 
             d['low_grade'] = format_grade(row['low grade'])
             d['high_grade'] = format_grade(row['high grade'])
