@@ -5,7 +5,10 @@ set -e
 export PYTHONPATH=..:../util
 
 ./import_manual_data.py
+echo "Importing pss 2017"
 ./import_pss.py 2017 ./data/downloaded/pss-2017-2018.csv
+echo "Importing pss 2015"
+./import_pss.py 2015 ./data/downloaded/pss-2015-2016.csv
 ./import_nces_schools.py 2017 ./data/downloaded/nces_schools_directory_2017.csv ./data/downloaded/nces_schools_characteristics_2017.csv ./data/downloaded/nces_schools_lunch_2017.csv ./data/downloaded/nces_schools_geo_2017.csv ./data/downloaded/nces_schools_membership_2017.csv
 ./import_assignments_oldstyle.py 2014 data/downloaded/all-staff-2014-2015.csv
 ./import_assignments_oldstyle.py 2015 data/downloaded/all-staff-2015-2016.csv

@@ -21,64 +21,76 @@ parser.add_argument('year', type=int, help='The lower year of the school year fo
 parser.add_argument('filename', help='The CSV appointments file')
 args = parser.parse_args()
 
+if args.year == 2017:
+    T = lambda s: s
+elif args.year == 2015:
+    T = lambda s: s.lower()
+else:
+    raise ValueError(f'please provide a valid column transform for year {args.year}')
+
+if args.year == 2017:
+    ENCODING = 'utf-8-sig'
+elif args.year == 2015:
+    ENCODING = 'windows-1252'
+else:
+    raise ValueError(f'Please specify an encoding for year {args.year}')
+
 def info():
-    with open(args.filename, newline='') as csvfile:
+    with open(args.filename, newline='', encoding=ENCODING) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if row['PCNTNM'] != 'RACINE':
+            if row[T('PCNTNM')] != 'RACINE':
                 continue
 
             d = {}
-            d['ppin'] = row['PPIN']
+            d['ppin'] = row[T('PPIN')]
             d['year'] = args.year
-            d['kg_hours'] = row['P365'].strip() or None
-            d['kg_days_per_week'] = row['P370'].strip() or None
-            d['is_religious'] = row['P430'] == '1'
-            orientation = row['P440']
+            d['kg_hours'] = row[T('P365')].strip() or None
+            d['kg_days_per_week'] = row[T('P370')].strip() or None
+            d['is_religious'] = row[T('P430')] == '1'
+            orientation = row[T('P440')] or None
             if orientation == '-1':
                 orientation = None
             d['religious_orientation'] = orientation
-            d['days_in_year'] = row['P645']
-            d['hours_in_day'] = row['P650']
-            d['minutes_in_day'] = row['P655']
-            d['num_students'] = row['NUMSTUDS']
-            d['num_fte_teachers'] = row['NUMTEACH']
-            d['enrollment'] = row['P305'] or None
-
-            print(f"""yielding {d['ppin']}""")
+            d['days_in_year'] = row[T('P645')]
+            d['hours_in_day'] = row[T('P650')]
+            d['minutes_in_day'] = row[T('P655')]
+            d['num_students'] = row[T('NUMSTUDS')]
+            d['num_fte_teachers'] = row[T('NUMTEACH')]
+            d['enrollment'] = row[T('P305')] or None
 
             yield d
 
 GRADE_MAP = (
-    ('PK', 'P150'),
-    ('KG', 'P160'),
-    ('01', 'P190'),
-    ('02', 'P200'),
-    ('03', 'P210'),
-    ('04', 'P220'),
-    ('05', 'P230'),
-    ('06', 'P240'),
-    ('07', 'P250'),
-    ('08', 'P260'),
-    ('09', 'P270'),
-    ('10', 'P280'),
-    ('11', 'P290'),
-    ('12', 'P300')
+    ('PK', T('P150')),
+    ('KG', T('P160')),
+    ('01', T('P190')),
+    ('02', T('P200')),
+    ('03', T('P210')),
+    ('04', T('P220')),
+    ('05', T('P230')),
+    ('06', T('P240')),
+    ('07', T('P250')),
+    ('08', T('P260')),
+    ('09', T('P270')),
+    ('10', T('P280')),
+    ('11', T('P290')),
+    ('12', T('P300'))
 )
 
 def grade_counts():
-    with open(args.filename, newline='') as csvfile:
+    with open(args.filename, newline='', encoding=ENCODING) as csvfile:
         reader = csv.DictReader(csvfile)
         ds = []
         for row in reader:
-            if row['PCNTNM'] != 'RACINE':
+            if row[T('PCNTNM')] != 'RACINE':
                 continue
             for grade, code in GRADE_MAP:
                 enrollment = row[code].strip() or None
                 if not enrollment:
                     continue
                 d = {}
-                d['ppin'] = row['PPIN']
+                d['ppin'] = row[T('PPIN')]
                 d['year'] = args.year
                 d['grade'] = grade
                 d['enrollment'] = enrollment
@@ -86,25 +98,25 @@ def grade_counts():
         return ds
 
 DEMOGRAPHIC_MAP = (
-    ('american_indian_or_alaska_native', 'P310'),
-    ('asian', 'P316'),
-    ('hawaiian_or_pacific_islander', 'P318'),
-    ('hispanic', 'P320'),
-    ('black', 'P325'),
-    ('white', 'P330'),
-    ('two_or_more_races', 'P332'),
-    ('male', 'P340'),
-    ('total', 'NUMSTUDS')
+    ('american_indian_or_alaska_native', T('P310')),
+    ('asian', T('P316')),
+    ('hawaiian_or_pacific_islander', T('P318')),
+    ('hispanic', T('P320')),
+    ('black', T('P325')),
+    ('white', T('P330')),
+    ('two_or_more_races', T('P332')),
+    ('male', T('P340')),
+    ('total', T('NUMSTUDS'))
 )
 
 def demo_counts():
-    with open(args.filename, newline='') as csvfile:
+    with open(args.filename, newline='', encoding=ENCODING) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            if row['PCNTNM'] != 'RACINE':
+            if row[T('PCNTNM')] != 'RACINE':
                 continue
             d = {}
-            d['ppin'] = row['PPIN']
+            d['ppin'] = row[T('PPIN')]
             d['year'] = args.year
             for col, code in DEMOGRAPHIC_MAP:
                 count = row[code].strip() or 0

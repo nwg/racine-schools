@@ -89,10 +89,20 @@ def pssdict(**extra):
     d = {
         'source': 'pss',
         'url': PSS_SURVEY_WEBSITE,
-        'year': MOST_RECENT_PSS_YEAR
     }
     d.update(extra)
     return d
+
+def most_recent_pss_year(cur, table, ppin):
+    where = idequals('ppin', ppin)
+    q = sql.SQL("""select year from {} where {} order by year desc limit 1""")\
+            .format(sql.Identifier(table), where)
+    cur.execute(q)
+    row = cur.fetchone()
+    if row:
+        return row[0]
+    else:
+        return None
 
 def render_school_summary_with_name(name):
     cur = make_cursor()
@@ -115,13 +125,15 @@ def render_school_summary_with_name(name):
     tables['summary'] = {}
     missing['summary'] = {}
     if ppin != None:
-        pss_info = get_pss_info(cur, MOST_RECENT_PSS_YEAR, ppin)
-        if pss_info != None:
-            tables['summary']['pss_info'] = pssdict(table=pss_info)
+        pss_year = most_recent_pss_year(cur, 'pss_info', ppin)
+        if pss_year:
+            pss_info = get_pss_info(cur, pss_year, ppin)
+            assert pss_info != None, 'missing pss info'
+            tables['summary']['pss_info'] = pssdict(table=pss_info, year=pss_year)
         else:
-            missing['summary']['pss_info'] = pssdict()
+            missing['summary']['pss_info'] = pssdict(year='N/A')
     else:
-        missing['summary']['pss_info'] = pssdict()
+        missing['summary']['pss_info'] = pssdict(year='N/A')
 
     t, m = student_tables(cur, school)
     tables['student'] = t
@@ -193,11 +205,21 @@ def student_tables(cur, school):
     missing = {}
 
     if ppin:
-        tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, MOST_RECENT_PSS_YEAR, ppin), grades=grades)
-        tables['pss_enrollment_by_demographic'] = pssdict(table=get_pss_enrollment_by_demographic(cur, MOST_RECENT_PSS_YEAR, ppin))
+        grade_year = most_recent_pss_year(cur, 'pss_enrollment_grade_counts', ppin)
+        if grade_year:
+            tables['pss_enrollment_by_grade'] = pssdict(table=get_pss_enrollment_by_grade(cur, grade_year, ppin), grades=grades, year=grade_year)
+        else:
+            missing['pss_enrollment_by_grade'] = pssdict(year=MOST_RECENT_PSS_YEAR)
+
+        demo_year = most_recent_pss_year(cur, 'pss_enrollment_demographic_counts', ppin)
+        if demo_year:
+            tables['pss_enrollment_by_demographic'] = pssdict(table=get_pss_enrollment_by_demographic(cur, demo_year, ppin), year=demo_year)
+        else:
+            missing['pss_enrollment_by_demographic'] = pssdict(year=MOST_RECENT_PSS_YEAR)
+
     elif is_private:
-        missing['pss_enrollment_by_grade'] = pssdict()
-        missing['pss_enrollment_by_demographic'] = pssdict()
+        missing['pss_enrollment_by_grade'] = pssdict(year=MOST_RECENT_PSS_YEAR)
+        missing['pss_enrollment_by_demographic'] = pssdict(year=MOST_RECENT_PSS_YEAR)
 
     def ncesdict(**extra):
         d = {
@@ -270,6 +292,8 @@ def staff_tables(cur, school):
     return tables, missing
 
 def get_pss_info(cur, year, ppin):
+    if not year:
+        return None
     def query_pss_info():
         joins = [
             (

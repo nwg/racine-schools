@@ -187,7 +187,7 @@ insert into pss_religious_orientation values
 
 
 create table pss_info (
-    ppin text primary key,
+    ppin text,
     year integer not null,
     kg_hours integer,
     kg_days_per_week integer,
