@@ -24,6 +24,16 @@ parser.add_argument('year', type=int, help='The lower year of the school year fo
 parser.add_argument('filename', help='The CSV appointments file')
 args = parser.parse_args()
 
+RACE_MAP = dict([
+    ('W - White', 'W'),
+    ('B - Black or African American', 'B'),
+    ('H - Hispanic/Latino', 'H'),
+    ('A - Asian', 'A'),
+    ('T - Two or More Races', 'T'),
+    ('I - American Indian or Alaska Native', 'I'),
+    ('P - Native Hawaiian or Other Pacific Islander', 'P')
+])
+
 def appointments():
     with open(args.filename, newline='') as csvfile:
         csvfile.readline()
@@ -64,6 +74,7 @@ def appointments():
 
             d['first_name'] = row['First Name'].strip()
             d['last_name'] = row['Last Name'].strip()
+            d['race'] = RACE_MAP[row['RaceEthnicity']]
 
             d['position_category'] = get_csv_str(row['Position Classification']) or 'Other'
             d['gender'] = row['Gender'].strip()

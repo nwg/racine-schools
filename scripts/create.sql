@@ -85,6 +85,7 @@ create table if not exists appointments (
     year integer not null,
     first_name text,
     last_name text,
+    race character(1) check (race in ('W', 'B', 'H', 'A', 'T', 'I', 'P')),
     state_lea_id text not null,
     state_school_id text not null,
     position_code integer,
@@ -101,6 +102,7 @@ create table appointments_distinct_ranked_most_recent (
     state_school_id text not null,
     first_name text,
     last_name text,
+    race character(1) check (race in ('W', 'B', 'H', 'A', 'T', 'I', 'P')),
     position_category text,
     gender text check (gender in ('M', 'F')),
     education_level integer references education_levels (level)

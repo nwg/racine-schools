@@ -31,8 +31,8 @@ if __name__ == '__main__':
     cur.execute(q)
 
     q = sql.SQL("""
-    insert into appointments_distinct_ranked_most_recent (year, state_lea_id, state_school_id, first_name, last_name, position_category, gender, education_level)
-    select distinct a2.year, a2.state_lea_id, a2.state_school_id, a2.first_name, a2.last_name, a2.position_category, a2.gender, a2.education_level from (
+    insert into appointments_distinct_ranked_most_recent (year, state_lea_id, state_school_id, first_name, last_name, race, position_category, gender, education_level)
+    select distinct a2.year, a2.state_lea_id, a2.state_school_id, a2.first_name, a2.last_name, a2.race, a2.position_category, a2.gender, a2.education_level from (
         select distinct s1.first_name, s1.last_name, s1.state_lea_id, s1.state_school_id, r2.position_category from (
             select a.first_name, a.last_name, a.state_lea_id, a.state_school_id, MAX(r.rank) as rank from appointments a
             inner join position_category_rank r

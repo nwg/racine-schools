@@ -9,6 +9,7 @@
 {%- endmacro %}
 
 {% set race_order = ['white', 'black', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races', 'total'] %}
+{% set race_order_nototal = ['white', 'black', 'american_indian_or_alaska_native', 'asian', 'hawaiian_or_pacific_islander', 'hispanic', 'two_or_more_races'] %}
 {% set category_order = ['Teachers', 'Administrators', 'Aides / Paraprofessionals', 'Pupil Services', 'Other'] %}
 {% set degree_map = dict([
     ('associate', "Associate Degree"),
@@ -52,6 +53,7 @@
     ('enrollment_by_grade_by_race', 'Enrollment by Grade and Race'),
     ('discipline_by_type_by_sex', 'Discipline by Type by Gender'),
     ('discipline_by_type_by_race', 'Discipline by Type by Race'),
+    ('staff_by_gender_by_race', 'Staff by Gender by Race'),
     ('staff_by_sex_by_category', 'Staff by Gender by Category'),
     ('staff_by_category_by_education', 'Staff by Category by Education'),
     ('staff_by_category_by_tenure', 'Staff by Category by Tenure'),
@@ -693,6 +695,44 @@ a.header-block:hover {
                             </tr>
                             {% endfor %}
                         </table>
+                        {% endif %}
+
+                        {% if tables.staff.staff_by_gender_by_race %}
+                        {% set table = tables.staff.staff_by_gender_by_race.table %}
+                        {% set year = tables.staff.staff_by_gender_by_race.year %}
+                        {% set source = tables.staff.staff_by_gender_by_race.source %}
+                        {% set url = tables.staff.staff_by_gender_by_race.url %}
+                        {% set rows = race_order_nototal %}
+                        {% set cols = ('F', 'M') %}
+                        <div class="data-table">
+                            <table>
+                                <caption>{{id_longname_map['staff_by_gender_by_race']}} ({{year}}-{{year+1}})</caption>
+                                <tr>
+                                    <th scope="col">Race</th>
+                                    <th scope="col">F</th>
+                                    <th scope="col">M</th>
+                                    <th scope="col">Total</th>
+                                </tr>
+
+                                {% for race in rows %}
+                                <tr>
+                                    <th scope="row">{{race_map[race]}}</th>
+                                    {% for gender in cols %}
+                                    <td>{{table[gender][race]}}</td>
+                                    {% endfor %}
+                                    <td>{{table.values() | sum(attribute=race)}}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <th scope="row">Total</th>
+                                    {% for gender in cols %}
+                                    <td>{{table[gender].values() | sum}}</td>
+                                    {% endfor %}
+                                    <td>{{(table['M'].values() | sum) + (table['F'].values() | sum)}}</td>
+                                </tr>
+                            </table>
+                            <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
                         {% endif %}
 
                         {% if tables.staff.staff_by_sex_by_category %}

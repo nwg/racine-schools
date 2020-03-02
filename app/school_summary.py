@@ -104,6 +104,20 @@ def most_recent_pss_year(cur, table, ppin):
     else:
         return None
 
+def most_recent_state_year(cur, state_lea_id, state_school_id):
+    where = andd([
+        idequals('state_lea_id', state_lea_id),
+        idequals('state_school_id', state_school_id)
+    ])
+    q = sql.SQL("""select year from appointments_distinct_ranked_most_recent where {} order by year desc limit 1""")\
+            .format(where)
+    cur.execute(q)
+    row = cur.fetchone()
+    if row:
+        return row[0]
+    else:
+        return None
+
 def render_school_summary_with_name(name):
     cur = make_cursor()
     school = db.school_with_name(cur, name)
@@ -254,12 +268,15 @@ def staff_tables(cur, school):
     missing = {}
     state_lea_id = school['state_lea_id']
     state_school_ids = get_all_state_school_ids(cur, school, MOST_RECENT_STAFF_YEAR)
+    state_school_id = school['state_school_id']
+
+    year = most_recent_state_year(cur, state_lea_id, state_school_id)
 
     def dpidict(**extra):
         d = {
             'source': 'dpi',
             'url': DPI_STAFF_WEBSITE,
-            'year': MOST_RECENT_STAFF_YEAR
+            'year': year
         }
         d.update(extra)
         return d
@@ -270,6 +287,12 @@ def staff_tables(cur, school):
         missing['staff_by_category_by_tenure'] = dpidict()
 
         return tables, missing
+
+    staff_by_gender_by_race = get_staff_by_gender_by_race(cur, school, year)
+    if staff_by_gender_by_race == None:
+        missing['staff_by_gender_by_race'] = dpidict()
+    else:
+        tables['staff_by_gender_by_race'] = dpidict(table=staff_by_gender_by_race)
 
     staff_by_sex_by_category = get_staff_by_sex_by_category(cur, school)
     if staff_by_sex_by_category == None:
@@ -470,6 +493,51 @@ def get_enrollment_by_grade_by_race(cur, year, school):
         enrollment_by_grade_by_race[grade] = race_dict
 
     return enrollment_by_grade_by_race
+
+APPT_RACE_MAP = dict([
+    ('A', 'asian'),
+    ('B', 'black'),
+    ('H', 'hispanic'),
+    ('I', 'american_indian_or_alaska_native'),
+    ('T', 'two_or_more_races'),
+    ('W', 'white'),
+    ('P', 'hawaiian_or_pacific_islander'),
+])
+
+def get_staff_by_gender_by_race(cur, school, year):
+    state_lea_id = school['state_lea_id']
+    state_school_id = school['state_school_id']
+    where = andd([
+        idequals('year', year),
+        idequals('state_lea_id', state_lea_id),
+        idequals('state_school_id', state_school_id),
+    ])
+    query = select('appointments_distinct_ranked_most_recent', '*', where=where)
+    cur.execute(query)
+    if not cur.fetchone():
+        return None
+
+    staff_by_gender_by_race = {}
+    for gender in ('M', 'F'):
+        staff_by_gender_by_race[gender] = dict.fromkeys(APPT_RACE_MAP.values(), 0)
+
+    query = sql.SQL(
+        """
+        select gender, race, count(*)
+        from appointments_distinct_ranked_most_recent
+        where {}
+        group by gender, race
+        """
+    ).format(where)
+
+    cur.execute(query)
+
+    for gender, race, count in cur.fetchall():
+        by_race = staff_by_gender_by_race[gender]
+        by_race[APPT_RACE_MAP[race]] = count
+        staff_by_gender_by_race[gender] = by_race
+
+    return staff_by_gender_by_race
 
 def get_staff_by_sex_by_category(cur, school):
     year = MOST_RECENT_STAFF_YEAR

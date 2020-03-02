@@ -9,8 +9,8 @@ def make_cursor():
     return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
 def school_with_name(cur, name):
-    sql = select('schools', '*', where=idequals('longname', name))
-    cur.execute(sql)
+    q = select('schools', '*', where=idequals('longname', name))
+    cur.execute(q)
     return cur.fetchone()
 
 def all_schools(cur):
