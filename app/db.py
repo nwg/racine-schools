@@ -3,10 +3,18 @@ import psycopg2.extras
 from psycopg_utils import select, idequals
 from psycopg2 import sql
 
-conn = psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
+
+def make_conn():
+    return psycopg2.connect("dbname='schools' user='postgres' host='localhost' password=''")
+
+conn = make_conn()
 
 def make_cursor():
-    return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    global conn
+    try:
+        return conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    except psycopg2.InterfaceError:
+        conn = make_conn()
 
 def school_with_name(cur, name):
     q = select('schools', '*', where=idequals('longname', name))
