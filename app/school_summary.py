@@ -161,12 +161,22 @@ def render_school_summary_with_name(name):
     tables['discipline'] = t
     missing['discipline'] = m
 
+    q = sql.SQL('''
+        select hide_where from hide_data_ui
+        where
+            school_id = {} AND
+            hidden = true
+    ''').format(sql.Literal(school['id']))
+    cur.execute(q)
+    hidden = { row['hide_where']: True for row in cur.fetchall() }
+
     return render_template(
         'school.html',
         school=school,
         tables=tables,
         missing=missing,
-        grade_order=GRADES_ORDER
+        grade_order=GRADES_ORDER,
+        hidden=hidden
     )
 
 DPI_STAFF_WEBSITE = "https://publicstaffreports.dpi.wi.gov/PubStaffReport/Public/PublicReport/AllStaffReport"

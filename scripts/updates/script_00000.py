@@ -2,11 +2,28 @@
 from psycopg2 import sql
 
 def execute(cur):
-    q = sql.SQL('select nces_id from schools where longname={}') \
+    q = sql.SQL('''
+        create table hide_data_ui (
+            school_id integer references schools (id),
+            hide_where text not null
+                check (hide_where in
+                    ('staff_by_category_by_tenure')
+                ),
+            hidden boolean not null
+        )
+    ''')
+    cur.execute(q)
+
+    q = sql.SQL('select id from schools where longname={}') \
             .format(sql.Literal('Racine Alternative Learning'))
     cur.execute(q)
     row = cur.fetchone()
-    nces_id = row['nces_id']
+    school_id = row['id']
 
-    q = sql.SQL('delete from discipline_counts where nces_id={}').format(sql.Literal(nces_id))
+    q = sql.SQL('insert into hide_data_ui values ({}, {}, {})') \
+        .format(
+            sql.Literal(school_id),
+            sql.Literal('staff_by_category_by_tenure'),
+            sql.Literal('true')
+        )
     cur.execute(q)

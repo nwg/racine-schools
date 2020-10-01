@@ -113,6 +113,20 @@ caption {
     caption-side: top;
 }
 
+div.hidden div.title {
+    font-family: Arial;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #444444;
+    padding-bottom: 6px;
+}
+
+div.hidden div.description {
+    font-family: Arial;
+    font-size: .90rem;
+    color: #777777;
+}
+
 table {
     border-collapse: collapse;
     border: 2px solid rgb(200, 200, 200);
@@ -801,7 +815,7 @@ a.header-block:hover {
                         </div>
                         {% endif %}
 
-                        {% if tables.staff.staff_by_category_by_tenure %}
+                        {% if tables.staff.staff_by_category_by_tenure and not hidden.staff_by_category_by_tenure %}
                         {% set staff_by_category_by_tenure = tables.staff.staff_by_category_by_tenure.table %}
                         {% set year = tables.staff.staff_by_category_by_tenure.year %}
                         {% set source = tables.staff.staff_by_category_by_tenure.source %}
@@ -835,6 +849,11 @@ a.header-block:hover {
                                 </tr>
                             </table>
                             <span class="source">Source: <a class="standard-link" href="{{url}}">{{source_map[source]}}</a></span>
+                        </div>
+                        {% else %}
+                        <div class="hidden">
+                            <div class="title">Staff by Category by Tenure at School ({{year}}-{{year+1}})</div>
+                            <div class="description">No Information</div>
                         </div>
                         {% endif %}
                     </div>
